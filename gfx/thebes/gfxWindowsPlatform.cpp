@@ -274,7 +274,6 @@ NS_IMPL_ISUPPORTS(D3DSharedTexturesReporter, nsIMemoryReporter)
 
 gfxWindowsPlatform::gfxWindowsPlatform()
     : mRenderMode(RENDER_GDI),
-      mSupportsHDR(false),
       mDwmCompositionStatus(DwmCompositionStatus::Unknown) {
   // If win32k is locked down then we can't use COM STA and shouldn't need it.
   // Also, we won't be using any GPU memory in this process.

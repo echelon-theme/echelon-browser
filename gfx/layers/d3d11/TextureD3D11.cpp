@@ -439,7 +439,7 @@ bool D3D11TextureData::SerializeSpecific(
   *aOutDesc = SurfaceDescriptorD3D10(
       (WindowsHandle)sharedHandle, mGpuProcessTextureId, mArrayIndex, mFormat,
       mSize, mColorSpace, mColorRange, /* hasKeyedMutex */ mHasKeyedMutex,
-      /* fenceInfo */ Nothing());
+      /* fenceInfo */ Nothing(), mGpuProcessQueryId);
   return true;
 }
 
@@ -531,10 +531,12 @@ D3D11TextureData* D3D11TextureData::Create(IntSize aSize, SurfaceFormat aFormat,
     newDesc.Format = DXGI_FORMAT_P016;
   }
 
+  bool useKeyedMutex = false;
   newDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
   if (!NS_IsMainThread()) {
     // On the main thread we use the syncobject to handle synchronization.
     if (!(aFlags & ALLOC_MANUAL_SYNCHRONIZATION)) {
+      useKeyedMutex = true;
       newDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX;
     }
   }

@@ -41,6 +41,10 @@
 #include "mozilla/TelemetryScalarEnums.h"
 #include "mozilla/Try.h"
 
+#ifdef XP_WIN
+#  include "mozilla/WindowsVersion.h"
+#endif
+
 #include "gfxPlatform.h"
 #include "gfxFont.h"
 

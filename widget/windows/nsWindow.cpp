@@ -1409,8 +1409,6 @@ DWORD nsWindow::WindowExStyle() {
       }
       return WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
     }
-    case WindowType::Sheet:
-      MOZ_FALLTHROUGH_ASSERT("Sheets are macOS specific");
     case WindowType::TopLevel:
     case WindowType::Invisible:
       break;
@@ -1634,9 +1632,8 @@ void nsWindow::Show(bool bState) {
 #endif  // defined(ACCESSIBILITY)
   }
 
-  if (mForMenupopupFrame) {
-    MOZ_ASSERT(ChooseWindowClass(mWindowType, mForMenupopupFrame) ==
-               kClassNameDropShadow);
+  if (mWindowType == WindowType::Popup) {
+    MOZ_ASSERT(ChooseWindowClass(mWindowType) == kClassNameDropShadow);
     const bool shouldUseDropShadow = [&] {
       if (mTransparencyMode == TransparencyMode::Transparent) {
         return false;
@@ -3237,42 +3234,6 @@ void nsWindow::UpdateWindowDraggingRegion(
     const LayoutDeviceIntRegion& aRegion) {
   if (mDraggableRegion != aRegion) {
     mDraggableRegion = aRegion;
-  }
-}
-
-void nsWindow::UpdateGlass() {
-  MARGINS margins = mGlassMargins;
-
-  // DWMNCRP_USEWINDOWSTYLE - The non-client rendering area is
-  //                          rendered based on the window style.
-  // DWMNCRP_ENABLED        - The non-client area rendering is
-  //                          enabled; the window style is ignored.
-  DWMNCRENDERINGPOLICY policy = DWMNCRP_USEWINDOWSTYLE;
-  switch (mTransparencyMode) {
-    case TransparencyMode::BorderlessGlass:
-      // Only adjust if there is some opaque rectangle
-      if (margins.cxLeftWidth >= 0) {
-        margins.cxLeftWidth += kGlassMarginAdjustment;
-        margins.cyTopHeight += kGlassMarginAdjustment;
-        margins.cxRightWidth += kGlassMarginAdjustment;
-        margins.cyBottomHeight += kGlassMarginAdjustment;
-      }
-      policy = DWMNCRP_ENABLED;
-      break;
-    default:
-      break;
-  }
-
-  MOZ_LOG(gWindowsLog, LogLevel::Info,
-          ("glass margins: left:%d top:%d right:%d bottom:%d\n",
-           margins.cxLeftWidth, margins.cyTopHeight, margins.cxRightWidth,
-           margins.cyBottomHeight));
-
-  // Extends the window frame behind the client area
-  if (gfxWindowsPlatform::GetPlatform()->DwmCompositionEnabled()) {
-    DwmExtendFrameIntoClientArea(mWnd, &margins);
-    DwmSetWindowAttribute(mWnd, DWMWA_NCRENDERING_POLICY, &policy,
-                          sizeof policy);
   }
 }
 
@@ -7908,14 +7869,6 @@ void nsWindow::SetWindowTranslucencyInner(TransparencyMode aMode) {
                reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
     ReleaseDC(mWnd, hdc);
   }
-}
-
-void nsWindow::UpdateOpaqueRegion(const LayoutDeviceIntRegion& aRegion) {
-  if (aRegion == mOpaqueRegion) {
-    return;
-  }
-  mOpaqueRegion = aRegion;
-  UpdateOpaqueRegionInternal();
 }
 
 void nsWindow::UpdateOpaqueRegionInternal() {

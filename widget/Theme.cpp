@@ -1346,7 +1346,7 @@ bool Theme::DoDrawWidgetBackground(PaintBackendData& aPaintData,
       break;
     }
     case StyleAppearance::Button:
-      PaintButton(aFrame, aPaintData, devPxRect, elementState, colors,
+      PaintButton(aFrame, aPaintData, devPxRect, aAppearance, elementState, colors,
                   dpiRatio);
       break;
     case StyleAppearance::FocusOutline:
