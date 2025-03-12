@@ -2262,9 +2262,8 @@ pref("font.size.monospace.x-math", 13);
   pref("gfx.font_rendering.cleartype_params.pixel_structure", -1);
   pref("gfx.font_rendering.cleartype_params.rendering_mode", -1);
 
-  // We no longer force "GDI Classic" mode on any fonts by default.
-  pref("gfx.font_rendering.cleartype_params.force_gdi_classic_for_families", "");
-  pref("gfx.font_rendering.cleartype_params.force_gdi_classic_max_size", 0);
+  pref("gfx.font_rendering.cleartype_params.force_gdi_classic_for_families", "Arial,Consolas,Courier New,Microsoft Sans Serif,Segoe UI,Tahoma,Trebuchet MS,Verdana");
+  pref("gfx.font_rendering.cleartype_params.force_gdi_classic_max_size", 15);
 
   // Switch the keyboard layout per window
   pref("intl.keyboard.per_window_layout", false);

@@ -64,6 +64,10 @@
   margin-inline-start: 0;
 }
 
+#versionContainer {
+  margin-top: 10px;
+}
+
 #version {
   font-weight: bold;
   margin-inline-start: 0;
@@ -139,6 +143,7 @@
 #updateBox {
   line-height: normal;
   display: grid;
+  font-style: italic;
 }
 
 #updateIcon {
@@ -154,12 +159,6 @@
   height: 16px;
   margin-inline: 5px;
 
-  &.noUpdatesFound {
-    display: block;
-    content: url("chrome://global/skin/icons/check.svg");
-    fill: #30e60b;
-  }
-
   &.apply {
     display: block;
     content: url("chrome://global/skin/icons/reload.svg");
@@ -167,6 +166,6 @@
 
   &:is(.checkingForUpdates, .downloading, .applying, .restarting) {
     display: block;
-    content: url("chrome://global/skin/icons/loading.svg");
+    content: image-set(url("chrome://global/skin/icons/loading.png"), url("chrome://global/skin/icons/loading@2x.png") 2x);
   }
 }

@@ -44,13 +44,15 @@
         <!-- This string is explicitly not translated -->
           Extended Support Release
         </label>
-#ifndef MOZ_UPDATER
         <!-- This HBOX is duplicated below with class="update" -->
-        <hbox align="baseline">
+        <hbox id="versionContainer" align="baseline">
+#ifdef MOZ_UPDATER
+          <label id="version" class="update"/>
+#else
           <label id="version"/>
+#endif
           <label id="releasenotes" is="text-link" hidden="true" data-l10n-id="releaseNotes-link"/>
         </hbox>
-#endif
 
         <label id="distribution" class="text-blurb"/>
         <label id="distributionId" class="text-blurb"/>
@@ -96,15 +98,6 @@
                 </description>
                 <description id="noUpdater"/>
               </deck>
-              <!-- This HBOX is duplicated above without class="update" -->
-              <hbox align="baseline">
-                <label id="version" class="update"/>
-                <label id="releasenotes" is="text-link" hidden="true" data-l10n-id="releaseNotes-link"/>
-              </hbox>
-              <description class="text-blurb">
-                <label id="aboutDialogHelpLink" is="text-link" data-l10n-id="aboutdialog-help-user"/>
-                <label id="submit-feedback" is="text-link" data-l10n-id="aboutdialog-submit-feedback"/>
-              </description>
             </vbox>
 #endif
           </hbox>
