@@ -19,7 +19,7 @@
 }
 
 #rightBox {
-  background-image: url("chrome://branding/content/about-wordmark.svg");
+  background-image: url("chrome://branding/content/about-wordmark.png");
   background-size: auto;
   margin-left: 300px;
   margin-right: 20px;
@@ -38,5 +38,3 @@
   color: rgba(255, 255, 255, 0.5);
   margin-block: 10px;
 }
-
-/*# sourceMappingURL=aboutDialog.css.map */
