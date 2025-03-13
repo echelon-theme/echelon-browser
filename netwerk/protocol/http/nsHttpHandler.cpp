@@ -953,19 +953,8 @@ void nsHttpHandler::BuildUserAgent() {
   mUserAgent += '/';
   mUserAgent += mProductSub;
 
-  bool isFirefox = mAppName.EqualsLiteral("Firefox");
-  if (isFirefox || mCompatFirefoxEnabled) {
-    // "Firefox/x.y" (compatibility) app token
-    mUserAgent += ' ';
-    mUserAgent += mCompatFirefox;
-  }
-  if (!isFirefox) {
-    // App portion
-    mUserAgent += ' ';
-    mUserAgent += mAppName;
-    mUserAgent += '/';
-    mUserAgent += mAppVersion;
-  }
+  mUserAgent += ' ';
+  mUserAgent += mCompatFirefox;
 }
 
 #ifdef XP_WIN
@@ -1185,12 +1174,6 @@ void nsHttpHandler::PrefsChanged(const char* pref) {
   //
 
   bool cVar = false;
-
-  if (PREF_CHANGED(UA_PREF("compatMode.firefox"))) {
-    rv = Preferences::GetBool(UA_PREF("compatMode.firefox"), &cVar);
-    mCompatFirefoxEnabled = (NS_SUCCEEDED(rv) && cVar);
-    mUserAgentIsDirty = true;
-  }
 
   // general.useragent.override
   if (PREF_CHANGED(UA_PREF("override"))) {
