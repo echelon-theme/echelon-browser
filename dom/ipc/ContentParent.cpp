@@ -2472,13 +2472,6 @@ bool ContentParent::BeginSubprocessLaunch(ProcessPriority aPriority) {
   nsCString parentBuildID(mozilla::PlatformBuildID());
   geckoargs::sParentBuildID.Put(parentBuildID.get(), extraArgs);
 
-#ifdef MOZ_WIDGET_GTK
-  // This is X11-only pending a solution for WebGL in Wayland mode.
-  if (StaticPrefs::dom_ipc_avoid_gtk() && widget::GdkIsX11Display()) {
-    mSubprocess->SetEnv("MOZ_HEADLESS", "1");
-  }
-#endif
-
   mLaunchYieldTS = TimeStamp::Now();
   return mSubprocess->AsyncLaunch(std::move(extraArgs));
 }
