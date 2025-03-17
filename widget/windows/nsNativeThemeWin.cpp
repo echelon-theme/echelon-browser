@@ -64,9 +64,7 @@ nsNativeThemeWin::~nsNativeThemeWin() { nsUXThemeData::Invalidate(); }
 bool nsNativeThemeWin::IsWidgetAlwaysNonNative(nsIFrame* aFrame,
                                                StyleAppearance aAppearance) {
   return Theme::IsWidgetAlwaysNonNative(aFrame, aAppearance) ||
-         aAppearance == StyleAppearance::MozMenulistArrowButton ||
-         aAppearance == StyleAppearance::SpinnerUpbutton ||
-         aAppearance == StyleAppearance::SpinnerDownbutton;
+         aAppearance == StyleAppearance::MozMenulistArrowButton;
 }
 
 static bool IsWidgetAlwaysNative(nsIFrame* aFrame,
@@ -491,6 +489,17 @@ nsresult nsNativeThemeWin::GetCachedMinimumWidgetSize(
   aResult->width = sz.cx;
   aResult->height = sz.cy;
 
+  switch (aAppearance) {
+    case StyleAppearance::SpinnerUpbutton:
+    case StyleAppearance::SpinnerDownbutton:
+      aResult->width++;
+      aResult->height = aResult->height / 2 + 1;
+      break;
+
+    default:
+      break;
+  }
+
   ::ReleaseDC(nullptr, hdc);
 
   mMinimumWidgetSizeCacheValid[cacheBitIndex] |= cacheBit;
@@ -535,6 +544,9 @@ mozilla::Maybe<nsUXThemeClass> nsNativeThemeWin::GetThemeClass(
     case StyleAppearance::Range:
     case StyleAppearance::RangeThumb:
       return Some(eUXTrackbar);
+    case StyleAppearance::SpinnerUpbutton:
+    case StyleAppearance::SpinnerDownbutton:
+      return Some(eUXSpin);
     case StyleAppearance::Menulist:
     case StyleAppearance::MenulistButton:
       return Some(eUXCombobox);
@@ -844,6 +856,20 @@ nsresult nsNativeThemeWin::GetThemePartAndState(nsIFrame* aFrame,
           aState = TS_HOVER;
         else
           aState = TS_NORMAL;
+      }
+      return NS_OK;
+    }
+    case StyleAppearance::SpinnerUpbutton:
+    case StyleAppearance::SpinnerDownbutton: {
+      aPart = (aAppearance == StyleAppearance::SpinnerUpbutton) ? SPNP_UP
+                                                                : SPNP_DOWN;
+      ElementState elementState = GetContentState(aFrame, aAppearance);
+      if (!aFrame) {
+        aState = TS_NORMAL;
+      } else if (elementState.HasState(ElementState::DISABLED)) {
+        aState = TS_DISABLED;
+      } else {
+        aState = StandardGetState(aFrame, aAppearance, false);
       }
       return NS_OK;
     }
@@ -1637,6 +1663,8 @@ bool nsNativeThemeWin::ClassicThemeSupportsWidget(nsIFrame* aFrame,
     case StyleAppearance::Scrollcorner:
     case StyleAppearance::Menulist:
     case StyleAppearance::MenulistButton:
+    case StyleAppearance::SpinnerUpbutton:
+    case StyleAppearance::SpinnerDownbutton:
     case StyleAppearance::Listbox:
     case StyleAppearance::ProgressBar:
     case StyleAppearance::Progresschunk:
@@ -1717,6 +1745,11 @@ LayoutDeviceIntSize nsNativeThemeWin::ClassicGetMinimumWidgetSize(
       break;
     case StyleAppearance::ScrollbarVertical:
       result.width = ::GetSystemMetrics(SM_CYVSCROLL);
+      break;
+    case StyleAppearance::SpinnerUpbutton:
+    case StyleAppearance::SpinnerDownbutton:
+      result.width = ::GetSystemMetrics(SM_CXVSCROLL);
+      result.height = 8;  // No good metrics available for this
       break;
     case StyleAppearance::RangeThumb: {
       if (IsRangeHorizontal(aFrame)) {
@@ -1878,6 +1911,32 @@ nsresult nsNativeThemeWin::ClassicGetThemePartAndState(
     case StyleAppearance::Tabpanels:
       // these don't use DrawFrameControl
       return NS_OK;
+    case StyleAppearance::SpinnerUpbutton:
+    case StyleAppearance::SpinnerDownbutton: {
+      ElementState contentState = GetContentState(aFrame, aAppearance);
+
+      aPart = DFC_SCROLL;
+      switch (aAppearance) {
+        case StyleAppearance::SpinnerUpbutton:
+          aState = DFCS_SCROLLUP;
+          break;
+        case StyleAppearance::SpinnerDownbutton:
+          aState = DFCS_SCROLLDOWN;
+          break;
+        default:
+          break;
+      }
+
+      if (contentState.HasState(ElementState::DISABLED)) {
+        aState |= DFCS_INACTIVE;
+      } else {
+        if (contentState.HasAllStates(ElementState::HOVER |
+                                      ElementState::ACTIVE))
+          aState |= DFCS_PUSHED;
+      }
+
+      return NS_OK;
+    }
     case StyleAppearance::ScrollbarbuttonUp:
     case StyleAppearance::ScrollbarbuttonDown:
     case StyleAppearance::ScrollbarbuttonLeft:
@@ -2087,6 +2146,8 @@ RENDER_AGAIN:
     // Draw controls supported by DrawFrameControl
     case StyleAppearance::Checkbox:
     case StyleAppearance::Radio:
+    case StyleAppearance::SpinnerUpbutton:
+    case StyleAppearance::SpinnerDownbutton:
     case StyleAppearance::ScrollbarbuttonUp:
     case StyleAppearance::ScrollbarbuttonDown:
     case StyleAppearance::ScrollbarbuttonLeft:

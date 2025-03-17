@@ -24,6 +24,7 @@ enum nsUXThemeClass {
   eUXTab,
   eUXScrollbar,
   eUXTrackbar,
+  eUXSpin,
   eUXCombobox,
   eUXListview,
   eUXMenu,
