@@ -543,7 +543,8 @@ nsChangeHint nsStyleBorder::CalcDifference(
 }
 
 nsStyleOutline::nsStyleOutline()
-    : mOutlineWidth(kMediumBorderWidth),
+    : mOutlineRadius(ZeroBorderRadius()),
+      mOutlineWidth(kMediumBorderWidth),
       mOutlineOffset({0.0f}),
       mOutlineColor(StyleColor::CurrentColor()),
       mOutlineStyle(StyleOutlineStyle::BorderStyle(StyleBorderStyle::None)),
@@ -552,7 +553,8 @@ nsStyleOutline::nsStyleOutline()
 }
 
 nsStyleOutline::nsStyleOutline(const nsStyleOutline& aSrc)
-    : mOutlineWidth(aSrc.mOutlineWidth),
+    : mOutlineRadius(aSrc.mOutlineRadius),
+      mOutlineWidth(aSrc.mOutlineWidth),
       mOutlineOffset(aSrc.mOutlineOffset),
       mOutlineColor(aSrc.mOutlineColor),
       mOutlineStyle(aSrc.mOutlineStyle),
