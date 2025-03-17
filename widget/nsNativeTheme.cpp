@@ -580,6 +580,5 @@ bool nsNativeTheme::IsWidgetScrollbarPart(StyleAppearance aAppearance) {
 bool nsNativeTheme::IsWidgetAlwaysNonNative(nsIFrame* aFrame,
                                             StyleAppearance aAppearance) {
   return IsWidgetScrollbarPart(aAppearance) ||
-         aAppearance == StyleAppearance::FocusOutline ||
          (aFrame && aFrame->StyleUI()->mMozTheme == StyleMozTheme::NonNative);
 }
