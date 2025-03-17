@@ -1034,11 +1034,6 @@ nsresult nsWindow::Create(nsIWidget* aParent, const LayoutDeviceIntRect& aRect,
         PropVariantClear(&pv);
       }
     }
-    HICON icon = ::LoadIconW(
-        ::GetModuleHandleW(nullptr),
-        MAKEINTRESOURCEW(IDI_APPICON));
-    SetBigIcon(icon);
-    SetSmallIcon(icon);
   }
 
   // If mDefaultScale is set before mWnd has been set, it will have the scale of
@@ -1246,7 +1241,15 @@ static const wchar_t* ChooseWindowClass(WindowType aWindowType) {
         return GetMainWindowClass();
     }
   }();
-  RegisterWindowClass(className, 0, gStockApplicationIcon);
+  LPWSTR iconID = [aWindowType]() -> LPWSTR {
+    switch (aWindowType) {
+      case WindowType::Dialog:
+        return 0;
+      default:
+        return gStockApplicationIcon;
+    }
+  }();
+  RegisterWindowClass(className, 0, iconID);
   return className;
 }
 
@@ -1341,6 +1344,7 @@ DWORD nsWindow::WindowStyle() {
 
 // Return nsWindow extended styles
 DWORD nsWindow::WindowExStyle() {
+  MOZ_ASSERT_IF(mIsAlert, mWindowType == WindowType::Dialog);
   switch (mWindowType) {
     case WindowType::Child:
       return 0;
@@ -1351,15 +1355,15 @@ DWORD nsWindow::WindowExStyle() {
       }
       return extendedStyle;
     }
-    case WindowType::Dialog:
+    case WindowType::Dialog: {
+      if (mIsAlert) {
+        return WS_EX_TOOLWINDOW;
+      }
+      return WS_EX_WINDOWEDGE | WS_EX_DLGMODALFRAME;
+    }
     case WindowType::TopLevel:
     case WindowType::Invisible:
       break;
-  }
-  if (mIsAlert) {
-    MOZ_ASSERT(mWindowType == WindowType::Dialog,
-               "Expect alert windows to have type=dialog");
-    return WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
   }
   return WS_EX_WINDOWEDGE;
 }
@@ -3492,6 +3496,7 @@ nsresult nsWindow::SetTitle(const nsAString& aTitle) {
  **************************************************************/
 
 void nsWindow::SetBigIcon(HICON aIcon) {
+  MOZ_LOG(gWindowsLog, LogLevel::Info, ("Setting big icon :3"));
   HICON icon =
       (HICON)::SendMessageW(mWnd, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)aIcon);
   if (icon) {
@@ -3502,6 +3507,7 @@ void nsWindow::SetBigIcon(HICON aIcon) {
 }
 
 void nsWindow::SetSmallIcon(HICON aIcon) {
+  MOZ_LOG(gWindowsLog, LogLevel::Info, ("Setting small icon :3"));
   HICON icon = (HICON)::SendMessageW(mWnd, WM_SETICON, (WPARAM)ICON_SMALL,
                                      (LPARAM)aIcon);
   if (icon) {
