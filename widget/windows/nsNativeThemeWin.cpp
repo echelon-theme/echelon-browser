@@ -1756,9 +1756,15 @@ LayoutDeviceIntSize nsNativeThemeWin::ClassicGetMinimumWidgetSize(
       break;
     case StyleAppearance::ScrollbarHorizontal:
       result.height = ::GetSystemMetrics(SM_CYHSCROLL);
+      if (ScrollbarDrawing::IsScrollbarWidthThin(aFrame)) {
+        result.height >>= 1;
+      }
       break;
     case StyleAppearance::ScrollbarVertical:
       result.width = ::GetSystemMetrics(SM_CYVSCROLL);
+      if (ScrollbarDrawing::IsScrollbarWidthThin(aFrame)) {
+        result.width >>= 1;
+      }
       break;
     case StyleAppearance::SpinnerUpbutton:
     case StyleAppearance::SpinnerDownbutton:
