@@ -126,14 +126,6 @@ function init() {
     });
   if (AppConstants.MOZ_UPDATER) {
     document
-      .getElementById("aboutDialogHelpLink")
-      .addEventListener("click", () => {
-        openHelpLink("firefox-help");
-      });
-    document
-      .getElementById("submit-feedback")
-      .addEventListener("click", openFeedbackPage);
-    document
       .getElementById("checkForUpdatesButton")
       .addEventListener("command", () => {
         gAppUpdater.checkForUpdates();
