@@ -17770,6 +17770,17 @@
   value: 0
   mirror: always
 
+# When to enable non-native scrollbars. Here are the current options:
+#
+#   0: Never use non-native scrollbars.
+#   1: Always use non-native scrollbars.
+#   2: Use non-native scrollbars when the frame has a scrollbar style set.
+#
+- name: widget.non-native-theme.scrollbar.enable
+  type: uint32_t
+  value: 0
+  mirror: always
+
 # An override that allows to override the default platform size. The size in CSS
 # pixels at full zoom of the minimum scrollbar width.
 - name: widget.non-native-theme.scrollbar.size.override
