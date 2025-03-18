@@ -17,6 +17,7 @@ button {
   background-color: ButtonFace;
   text-shadow: none;
   border: 1px solid ThreeDLightShadow;
+  padding: 2px 3px;
 
   &:where(:hover) {
     background-color: -moz-buttonhoverface;
@@ -62,21 +63,13 @@ button {
   fill: currentColor;
 }
 
-.button-box {
-  border: 1px solid transparent;
-  padding-top: 1px;
-  padding-bottom: 2px;
-  padding-inline-start: 3px;
-  padding-inline-end: 4px;
-}
-
 @media (-moz-windows-classic) {
-  button:hover:active > .button-box,
-  button[open="true"] > .button-box,
-  button[checked="true"] > .button-box {
-    padding-top: 2px;
+  button:hover:active,
+  button[open="true"],
+  button[checked="true"] {
+    padding-top: 3px;
     padding-bottom: 1px;
-    padding-inline-start: 4px;
-    padding-inline-end: 3px;
+    padding-left: 4px;
+    padding-right: 2px;
   }
 }
