@@ -2296,7 +2296,7 @@ nscoord nsBlockFrame::ComputeFinalSize(const ReflowInput& aReflowInput,
       finalSize.BSize(wm) = aReflowInput.AvailableBSize();
     } else if (aState.mReflowStatus.IsComplete()) {
       const nscoord lineClampedContentBlockEndEdge =
-          ApplyLineClamp(aReflowInput, this, blockEndEdgeOfChildren);
+          ApplyLineClamp(blockEndEdgeOfChildren);
 
       const nscoord bpBStart = borderPadding.BStart(wm);
       const nscoord contentBSize = blockEndEdgeOfChildren - bpBStart;

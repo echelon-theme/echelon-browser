@@ -200,7 +200,6 @@ nsComboboxControlFrame::nsComboboxControlFrame(ComputedStyle* aStyle,
 
 NS_QUERYFRAME_HEAD(nsComboboxControlFrame)
   NS_QUERYFRAME_ENTRY(nsComboboxControlFrame)
-  NS_QUERYFRAME_ENTRY(nsIFormControlFrame)
   NS_QUERYFRAME_ENTRY(nsIAnonymousContentCreator)
   NS_QUERYFRAME_ENTRY(nsISelectControlFrame)
 NS_QUERYFRAME_TAIL_INHERITING(nsBlockFrame)

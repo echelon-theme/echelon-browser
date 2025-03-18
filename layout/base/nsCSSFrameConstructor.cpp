@@ -63,6 +63,7 @@
 #include "nsCSSPseudoElements.h"
 #include "nsError.h"
 #include "nsFieldSetFrame.h"
+#include "nsFileControlFrame.h"
 #include "nsFirstLetterFrame.h"
 #include "nsFlexContainerFrame.h"
 #include "nsGkAtoms.h"

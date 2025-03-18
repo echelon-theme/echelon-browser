@@ -77,7 +77,7 @@ class nsComboboxControlFrame final : public nsBlockFrame,
   nscoord IntrinsicISize(const mozilla::IntrinsicSizeInput& aInput,
                          mozilla::IntrinsicISizeType aType) final;
 
-  nscoord GetPrefISize(gfxContext* aRenderingContext) final;
+  nscoord GetPrefISize(gfxContext* aRenderingContext);
 
   void Reflow(nsPresContext* aCX, ReflowOutput& aDesiredSize,
               const ReflowInput& aReflowInput, nsReflowStatus& aStatus) final;
@@ -119,7 +119,7 @@ class nsComboboxControlFrame final : public nsBlockFrame,
    * @note This method might destroy |this|.
    */
   MOZ_CAN_RUN_SCRIPT_BOUNDARY
-  void SetFocus(bool aOn, bool aRepaint) final;
+  void SetFocus(bool aOn, bool aRepaint);
 
   /**
    * Return the available space before and after this frame for

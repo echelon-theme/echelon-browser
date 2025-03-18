@@ -121,18 +121,14 @@ menupopup {
 
 /* Rules for popups associated with menulists */
 menulist > menupopup {
-  min-width: 0;
-
-  @media (-moz-platform: windows) {
-    font: inherit;
-  }
-
-  @media (-moz-platform: macos) {
-    &:not([position]) {
-      margin-inline-start: -13px;
-      margin-top: -1px;
-    }
-  }
+	font: inherit;
+	appearance: none;
+	background-color: transparent;
+	border: none;
+	min-width: 0;
+  color: FieldText;
+  --panel-background: Field;
+  --panel-border-color: ThreeDShadow;
 }
 
 /* ::::: arrow panel ::::: */

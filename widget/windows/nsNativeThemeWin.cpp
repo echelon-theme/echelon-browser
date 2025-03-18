@@ -61,12 +61,6 @@ nsNativeThemeWin::nsNativeThemeWin()
 
 nsNativeThemeWin::~nsNativeThemeWin() { nsUXThemeData::Invalidate(); }
 
-bool nsNativeThemeWin::IsWidgetAlwaysNonNative(nsIFrame* aFrame,
-                                               StyleAppearance aAppearance) {
-  return Theme::IsWidgetAlwaysNonNative(aFrame, aAppearance) ||
-         aAppearance == StyleAppearance::MozMenulistArrowButton;
-}
-
 static bool IsWidgetAlwaysNative(nsIFrame* aFrame,
                                  StyleAppearance aAppearance) {
   if (aFrame && aFrame->StyleUI()->mMozTheme == StyleMozTheme::NonNative) {
@@ -628,6 +622,7 @@ mozilla::Maybe<nsUXThemeClass> nsNativeThemeWin::GetThemeClass(
       return Some(eUXSpin);
     case StyleAppearance::Menulist:
     case StyleAppearance::MenulistButton:
+    case StyleAppearance::MozMenulistArrowButton:
       return Some(eUXCombobox);
     case StyleAppearance::Listbox:
       return Some(eUXListview);
@@ -1039,6 +1034,75 @@ nsresult nsNativeThemeWin::GetThemePartAndState(nsIFrame* aFrame,
 
       return NS_OK;
     }
+    case StyleAppearance::MozMenulistArrowButton: {
+      bool isOpen = false;
+
+      // HTML select and XUL menulist dropdown buttons get state from the
+      // parent.
+      nsIFrame* parentFrame = aFrame->GetParent();
+      aFrame = parentFrame;
+
+      ElementState elementState = GetContentState(aFrame, aAppearance);
+      aPart = CBP_DROPMARKER_VISTA;
+
+      // For HTML controls with author styling, we should fall
+      // back to the old dropmarker style to avoid clashes with
+      // author-specified backgrounds and borders (bug #441034)
+      if (IsWidgetStyled(aFrame->PresContext(), aFrame,
+                         StyleAppearance::Menulist)) {
+        aPart = CBP_DROPMARKER;
+      }
+
+      if (elementState.HasState(ElementState::DISABLED)) {
+        aState = TS_DISABLED;
+        return NS_OK;
+      }
+
+      if (nsComboboxControlFrame* ccf = do_QueryFrame(aFrame)) {
+        isOpen = ccf->IsDroppedDown();
+        if (isOpen) {
+          /* Hover is propagated, but we need to know whether we're hovering
+           * just the combobox frame, not the dropdown frame. But, we can't get
+           * that information, since hover is on the content node, and they
+           * share the same content node.  So, instead, we cheat -- if the
+           * dropdown is open, we always show the hover state.  This looks fine
+           * in practice.
+           */
+          aState = TS_HOVER;
+          return NS_OK;
+        }
+      } else {
+        /* The dropdown indicator on a menulist button in chrome is not given a
+         * hover effect. When the frame isn't isn't HTML content, we cheat and
+         * force the dropdown state to be normal. (Bug 430434)
+         */
+        isOpen = IsOpenButton(aFrame);
+        aState = TS_NORMAL;
+        return NS_OK;
+      }
+
+      aState = TS_NORMAL;
+
+      // Dropdown button active state doesn't need :hover.
+      if (elementState.HasState(ElementState::ACTIVE)) {
+        if (isOpen) {
+          // XXX Button should look active until the mouse is released, but
+          //     without making it look active when the popup is clicked.
+          return NS_OK;
+        }
+        aState = TS_ACTIVE;
+      } else if (elementState.HasState(ElementState::HOVER)) {
+        // No hover effect for XUL menulists and autocomplete dropdown buttons
+        // while the dropdown menu is open.
+        if (isOpen) {
+          // XXX HTML select dropdown buttons should have the hover effect when
+          //     hovering the combobox frame, but not the popup frame.
+          return NS_OK;
+        }
+        aState = TS_HOVER;
+      }
+      return NS_OK;
+    }
     case StyleAppearance::Menupopup: {
       aPart = MENU_POPUPBACKGROUND;
       aState = MB_ACTIVE;
@@ -1400,6 +1464,9 @@ RENDER_AGAIN:
       InflateRect(&widgetRect, -1, -1);
       ::FillRect(hdc, &widgetRect, reinterpret_cast<HBRUSH>(COLOR_BTNFACE + 1));
     }
+  } else if (aAppearance == StyleAppearance::MozMenulistArrowButton) {
+    DrawThemeBGRTLAware(theme, hdc, part, state, &widgetRect, &clipRect,
+                        IsFrameRTL(aFrame));
   } else if (aAppearance == StyleAppearance::ProgressBar) {
     // DrawThemeBackground renders each corner with a solid white pixel.
     // Restore these pixels to the underlying color. Tracks are rendered
@@ -1795,7 +1862,8 @@ LayoutDeviceIntSize nsNativeThemeWin::GetMinimumWidgetSize(
     case StyleAppearance::ScrollbarbuttonLeft:
     case StyleAppearance::ScrollbarbuttonRight:
     case StyleAppearance::ScrollbarHorizontal:
-    case StyleAppearance::ScrollbarVertical: {
+    case StyleAppearance::ScrollbarVertical:
+    case StyleAppearance::MozMenulistArrowButton: {
       auto result = ClassicGetMinimumWidgetSize(aFrame, aAppearance);
       ScaleForFrameDPI(&result, aFrame);
       return result;
@@ -2020,6 +2088,7 @@ bool nsNativeThemeWin::ClassicThemeSupportsWidget(nsIFrame* aFrame,
     case StyleAppearance::Scrollcorner:
     case StyleAppearance::Menulist:
     case StyleAppearance::MenulistButton:
+    case StyleAppearance::MozMenulistArrowButton:
     case StyleAppearance::SpinnerUpbutton:
     case StyleAppearance::SpinnerDownbutton:
     case StyleAppearance::Listbox:
@@ -2169,6 +2238,9 @@ LayoutDeviceIntSize nsNativeThemeWin::ClassicGetMinimumWidgetSize(
       }
       break;
     }
+    case StyleAppearance::MozMenulistArrowButton:
+      result.width = ::GetSystemMetrics(SM_CXVSCROLL);
+      break;
     case StyleAppearance::Menulist:
     case StyleAppearance::MenulistButton:
     case StyleAppearance::Button:
@@ -2375,6 +2447,41 @@ nsresult nsNativeThemeWin::ClassicGetThemePartAndState(
     case StyleAppearance::Menupopup:
       // these don't use DrawFrameControl
       return NS_OK;
+    case StyleAppearance::MozMenulistArrowButton: {
+      aPart = DFC_SCROLL;
+      aState = DFCS_SCROLLCOMBOBOX;
+
+      nsIFrame* parentFrame = aFrame->GetParent();
+      // HTML select and XUL menulist dropdown buttons get state from the
+      // parent.
+      aFrame = parentFrame;
+
+      ElementState elementState = GetContentState(aFrame, aAppearance);
+
+      if (elementState.HasState(ElementState::DISABLED)) {
+        aState |= DFCS_INACTIVE;
+        return NS_OK;
+      }
+
+      bool isOpen = false;
+      if (nsComboboxControlFrame* ccf = do_QueryFrame(aFrame)) {
+        isOpen = ccf->IsDroppedDown();
+      } else {
+        isOpen = IsOpenButton(aFrame);
+      }
+
+      // XXX Button should look active until the mouse is released, but
+      //     without making it look active when the popup is clicked.
+      if (isOpen) {
+        return NS_OK;
+      }
+
+      // Dropdown button active state doesn't need :hover.
+      if (elementState.HasState(ElementState::ACTIVE))
+        aState |= DFCS_PUSHED | DFCS_FLAT;
+
+      return NS_OK;
+    }
     case StyleAppearance::Menuseparator:
       aPart = 0;
       aState = 0;
@@ -2664,7 +2771,8 @@ RENDER_AGAIN:
     case StyleAppearance::ScrollbarbuttonUp:
     case StyleAppearance::ScrollbarbuttonDown:
     case StyleAppearance::ScrollbarbuttonLeft:
-    case StyleAppearance::ScrollbarbuttonRight: {
+    case StyleAppearance::ScrollbarbuttonRight:
+    case StyleAppearance::MozMenulistArrowButton: {
       // setup DC to make DrawFrameControl draw correctly
       int32_t oldTA = ::SetTextAlign(hdc, TA_TOP | TA_LEFT | TA_NOUPDATECP);
       ::DrawFrameControl(hdc, &widgetRect, part, state);
@@ -2927,6 +3035,10 @@ uint32_t nsNativeThemeWin::GetWidgetNativeDrawingFlags(
              gfxWindowsNativeDrawing::CAN_AXIS_ALIGNED_SCALE |
              gfxWindowsNativeDrawing::CANNOT_COMPLEX_TRANSFORM;
 
+    // the dropdown button /almost/ renders correctly with scaling,
+    // except that the graphic in the dropdown button (the downward arrow)
+    // doesn't get scaled up.
+    case StyleAppearance::MozMenulistArrowButton:
     // these are definitely no; they're all graphics that don't get scaled up
     case StyleAppearance::Checkbox:
     case StyleAppearance::Radio:
