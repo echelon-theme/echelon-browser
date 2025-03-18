@@ -123,6 +123,8 @@ include = [
   "DisplayInside",
   "DisplayMode",
   "Platform",
+  "OSStyle",
+  "EchelonStyle",
   "PositionAnchor",
   "PositionArea",
   "PositionAreaKeyword",

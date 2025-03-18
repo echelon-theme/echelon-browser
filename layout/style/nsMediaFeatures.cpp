@@ -32,6 +32,7 @@
 #ifdef XP_WIN
 #  include "mozilla/WindowsVersion.h"
 #endif
+#include "mozilla/StaticPrefs_echelon.h"
 
 using namespace mozilla;
 using mozilla::dom::DisplayMode;
@@ -261,6 +262,18 @@ bool Gecko_MediaFeatures_MatchesPlatform(StylePlatform aPlatform) {
     default:
       return false;
   }
+}
+
+bool Gecko_MediaFeatures_MatchesOSStyle(StyleOSStyle aOSStyle) {
+  uint32_t osStyle = StaticPrefs::echelon_theme_os_style();
+  if (osStyle > (uint32_t)StyleOSStyle::Windows10)
+    osStyle = (uint32_t)StyleOSStyle::Windows10;
+  return osStyle == (uint32_t)aOSStyle;
+}
+
+bool Gecko_MediaFeatures_MatchesEchelonStyle(StyleEchelonStyle aEchelonStyle) {
+  uint32_t echelonStyle = StaticPrefs::echelon_theme_style();
+  return echelonStyle >= (uint32_t)aEchelonStyle;
 }
 
 bool Gecko_MediaFeatures_PrefersReducedMotion(const Document* aDocument) {

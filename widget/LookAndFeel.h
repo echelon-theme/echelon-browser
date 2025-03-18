@@ -104,6 +104,22 @@ class LookAndFeel {
      */
     WindowsAccentColorInTitlebar,
 
+    /*
+     * A Boolean value to determine whether the DWM compositor is being used
+     *
+     * This metric is not used on non-Windows platforms. These platforms
+     * should return NS_ERROR_NOT_IMPLEMENTED when queried for this metric.
+     */
+    DWMCompositor,
+    /*
+     * A Boolean value to determine whether Windows is themed (Classic vs.
+     * uxtheme)
+     *
+     * This is Windows-specific and is not implemented on other platforms
+     * (will return the default of NS_ERROR_FAILURE).
+     */
+    WindowsClassic,
+
     /* Whether Windows mica effect is enabled and available */
     WindowsMica,
 

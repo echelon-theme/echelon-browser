@@ -43,6 +43,7 @@ pref_groups = [
     "devtools",
     "docshell",
     "dom",
+    "echelon",
     "editor",
     "extensions",
     "fission",

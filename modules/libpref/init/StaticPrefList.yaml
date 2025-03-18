@@ -5390,6 +5390,51 @@
   mirror: always
 
 #---------------------------------------------------------------------------
+# Echelon prefs
+#---------------------------------------------------------------------------
+
+# The OS style Echelon should use. Values are:
+# 
+#   0: Windows XP
+#   1: Windows Vista/7
+#   2: Windows 8.x
+#   3: Windows 10
+#
+# This comment should be kept up to date with the OSStyle enum in
+# servo/components/style/gecko/media_features.rs.
+- name: echelon.theme.os-style
+  type: uint32_t
+  value: 3
+  mirror: always
+
+# The Firefox style Echelon should use. Values are:
+# 
+#   0: Firefox 4
+#   1: Firefox 5
+#   2: Firefox 6
+#   3: Firefox 8
+#   4: Firefox 10
+#   5: Firefox 14
+#   6: Firefox 28
+#   7: Firefox 29
+#   8: Firefox 56
+#
+# This comment should be kept up to date with the EchelonStyle enum in
+# servo/components/style/gecko/media_features.rs.
+- name: echelon.theme.style
+  type: uint32_t
+  value: 0
+  mirror: always
+
+# When set to true, Echelon will act as if DWM is disabled.
+# When set to false, Echelon will use the system API to check if
+# DWM is enabled.
+- name: echelon.theme.no-composition
+  type: bool
+  value: false
+  mirror: always
+
+#---------------------------------------------------------------------------
 # Prefs starting with "editor"
 #---------------------------------------------------------------------------
 

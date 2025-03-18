@@ -615,6 +615,8 @@ float Gecko_MediaFeatures_GetDevicePixelRatio(const mozilla::dom::Document*);
 
 bool Gecko_MediaFeatures_IsResourceDocument(const mozilla::dom::Document*);
 bool Gecko_MediaFeatures_MatchesPlatform(mozilla::StylePlatform);
+bool Gecko_MediaFeatures_MatchesOSStyle(mozilla::StyleOSStyle);
+bool Gecko_MediaFeatures_MatchesEchelonStyle(mozilla::StyleEchelonStyle);
 mozilla::StyleGtkThemeFamily Gecko_MediaFeatures_GtkThemeFamily();
 
 void Gecko_GetSafeAreaInsets(const nsPresContext*, float*, float*, float*,

@@ -16,6 +16,7 @@
 #include "mozilla/FontPropertyTypes.h"
 #include "mozilla/Telemetry.h"
 #include "mozilla/widget/WinRegistry.h"
+#include "mozilla/StaticPrefs_echelon.h"
 
 using namespace mozilla;
 using namespace mozilla::widget;
@@ -186,7 +187,6 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
     }
   }
 
-  static constexpr auto kNonNativeMenuText = NS_RGB(0x15, 0x14, 0x1a);
   nsresult res = NS_OK;
   int idx;
   switch (aID) {
@@ -434,6 +434,16 @@ nsresult nsLookAndFeel::NativeGetInt(IntID aID, int32_t& aResult) {
       break;
     case IntID::TreeScrollLinesMax:
       aResult = 3;
+      break;
+    case IntID::WindowsClassic:
+      aResult = !nsUXThemeData::IsAppThemed();
+      break;
+    case IntID::DWMCompositor:
+      if (StaticPrefs::echelon_theme_no_composition()) {
+        aResult = 0;
+        break;
+      }
+      aResult = gfxWindowsPlatform::GetPlatform()->DwmCompositionEnabled();
       break;
     case IntID::WindowsAccentColorInTitlebar:
       aResult = mTitlebarColors.mUseAccent;

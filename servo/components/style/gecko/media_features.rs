@@ -566,6 +566,62 @@ fn eval_moz_platform(_: &Context, query_value: Option<Platform>) -> bool {
     unsafe { bindings::Gecko_MediaFeatures_MatchesPlatform(query_value) }
 }
 
+/// Allows front-end CSS to discern OS style via media queries.
+#[derive(Clone, Copy, Debug, FromPrimitive, Parse, ToCss)]
+#[repr(u8)]
+pub enum OSStyle {
+    /// Echelon will be styled like Firefox on Windows XP.
+    WindowsXP,
+    /// Echelon will be styled like Firefox on Windows Vista/7.
+    Windows7,
+    /// Echelon will be styled like Firefox on Windows 8.
+    Windows8,
+    /// Echelon will be styled like Firefox on Windows 10.
+    Windows10,
+}
+
+fn eval_echelon_os_style(_: &Context, query_value: Option<OSStyle>) -> bool {
+    let query_value = match query_value {
+        Some(v) => v,
+        None => return false,
+    };
+
+    unsafe { bindings::Gecko_MediaFeatures_MatchesOSStyle(query_value) }
+}
+
+/// Allows front-end CSS to discern Echelon style via media queries.
+#[derive(Clone, Copy, Debug, FromPrimitive, Parse, ToCss)]
+#[repr(u8)]
+pub enum EchelonStyle {
+    /// Echelon will be styled like Firefox 4.
+    Firefox4,
+    /// Echelon will be styled like Firefox 5.
+    Firefox5,
+    /// Echelon will be styled like Firefox 6.
+    Firefox6,
+    /// Echelon will be styled like Firefox 8.
+    Firefox8,
+    /// Echelon will be styled like Firefox 10.
+    Firefox10,
+    /// Echelon will be styled like Firefox 14.
+    Firefox14,
+    /// Echelon will be styled like Firefox 28.
+    Firefox28,
+    /// Echelon will be styled like Firefox 29.
+    Firefox29,
+    /// Echelon will be styled like Firefox 56.
+    Firefox56,
+}
+
+fn eval_echelon_style(_: &Context, query_value: Option<EchelonStyle>) -> bool {
+    let query_value = match query_value {
+        Some(v) => v,
+        None => return false,
+    };
+
+    unsafe { bindings::Gecko_MediaFeatures_MatchesEchelonStyle(query_value) }
+}
+
 /// Allows front-end CSS to discern gtk theme via media queries.
 #[derive(Clone, Copy, Debug, FromPrimitive, Parse, PartialEq, ToCss)]
 #[repr(u8)]
@@ -671,7 +727,7 @@ macro_rules! lnf_int_feature {
 /// to support new types in these entries and (2) ensuring that either
 /// nsPresContext::MediaFeatureValuesChanged is called when the value that
 /// would be returned by the evaluator function could change.
-pub static MEDIA_FEATURES: [QueryFeatureDescription; 61] = [
+pub static MEDIA_FEATURES: [QueryFeatureDescription; 65] = [
     feature!(
         atom!("width"),
         AllowsRanges::Yes,
@@ -919,6 +975,18 @@ pub static MEDIA_FEATURES: [QueryFeatureDescription; 61] = [
         FeatureFlags::CHROME_AND_UA_ONLY,
     ),
     feature!(
+        atom!("-echelon-os-style"),
+        AllowsRanges::No,
+        keyword_evaluator!(eval_echelon_os_style, OSStyle),
+        FeatureFlags::CHROME_AND_UA_ONLY,
+    ),
+    feature!(
+        atom!("-echelon-style"),
+        AllowsRanges::No,
+        keyword_evaluator!(eval_echelon_style, EchelonStyle),
+        FeatureFlags::CHROME_AND_UA_ONLY,
+    ),
+    feature!(
         atom!("-moz-gtk-theme-family"),
         AllowsRanges::No,
         keyword_evaluator!(eval_gtk_theme_family, GtkThemeFamily),
@@ -969,6 +1037,8 @@ pub static MEDIA_FEATURES: [QueryFeatureDescription; 61] = [
         atom!("-moz-windows-accent-color-in-titlebar"),
         WindowsAccentColorInTitlebar
     ),
+    lnf_int_feature!(atom!("-moz-windows-compositor"), DWMCompositor),
+    lnf_int_feature!(atom!("-moz-windows-classic"), WindowsClassic),
     lnf_int_feature!(atom!("-moz-windows-mica"), WindowsMica),
     lnf_int_feature!(atom!("-moz-swipe-animation-enabled"), SwipeAnimationEnabled),
     lnf_int_feature!(atom!("-moz-gtk-csd-available"), GTKCSDAvailable),
