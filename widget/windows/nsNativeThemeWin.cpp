@@ -2366,6 +2366,7 @@ nsresult nsNativeThemeWin::ClassicGetThemePartAndState(
     case StyleAppearance::ScrollbarHorizontal:
     case StyleAppearance::Scrollcorner:
     case StyleAppearance::Progresschunk:
+    case StyleAppearance::Tooltip:
     case StyleAppearance::ProgressBar:
     case StyleAppearance::Tab:
     case StyleAppearance::Tabpanel:
