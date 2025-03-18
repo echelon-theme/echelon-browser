@@ -107,6 +107,7 @@ menupopup {
     border: 1px solid ThreeDShadow;
     --panel-background: transparent;
     --panel-border-color: transparent;
+    --panel-border-radius: 0;
     --nested-margin: -3px;
     --panel-shadow-margin: 0px;
     --panel-padding: 0;

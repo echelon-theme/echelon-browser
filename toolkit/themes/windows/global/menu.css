@@ -139,16 +139,14 @@ menubar > menu[_moz-menuactive="true"]:not([disabled="true"]) {
   text-shadow: none;
 }
 
-@media (-moz-windows-default-theme) {
-  :root[lwtheme] menubar > menu {
-    appearance: auto;
-    -moz-default-appearance: menuitem;
-  }
+:root[lwtheme] menubar > menu {
+  appearance: auto;
+  -moz-default-appearance: menuitem;
+}
 
-  :root[lwtheme] menubar > menu[_moz-menuactive="true"]:not([disabled="true"]) {
-    color: inherit !important;
-    text-shadow: inherit;
-  }
+:root[lwtheme] menubar > menu[_moz-menuactive="true"]:not([disabled="true"]) {
+  color: inherit !important;
+  text-shadow: inherit;
 }
 
 /* ..... internal content .... */

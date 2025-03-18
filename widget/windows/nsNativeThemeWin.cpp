@@ -2065,6 +2065,12 @@ LayoutDeviceIntMargin nsNativeThemeWin::ClassicGetWidgetBorder(
     case StyleAppearance::ProgressBar:
       result.top = result.left = result.bottom = result.right = 1;
       break;
+    case StyleAppearance::Menubar:
+      result.top = result.left = result.bottom = result.right = 0;
+      break;
+    case StyleAppearance::Menupopup:
+      result.top = result.left = result.bottom = result.right = 3;
+      break;
     default:
       result.top = result.bottom = result.left = result.right = 0;
       break;
