@@ -747,6 +747,15 @@ nsWindow::~nsWindow() {
  *
  **************************************************************/
 
+static bool ShouldCacheTitleBarInfo(WindowType aWindowType,
+                                    BorderStyle aBorderStyle) {
+  return (aWindowType == WindowType::TopLevel) &&
+         (aBorderStyle == BorderStyle::Default ||
+          aBorderStyle == BorderStyle::All) &&
+         (!nsUXThemeData::sTitlebarInfoPopulatedThemed ||
+          !nsUXThemeData::sTitlebarInfoPopulatedAero);
+}
+
 void nsWindow::SendAnAPZEvent(InputData& aEvent) {
   LRESULT popupHandlingResult;
   if (DealWithPopups(mWnd, MOZ_WM_DMANIP, 0, 0, &popupHandlingResult)) {
@@ -1122,6 +1131,12 @@ nsresult nsWindow::Create(nsIWidget* aParent, const LayoutDeviceIntRect& aRect,
 
   mDefaultIMC.Init(this);
   IMEHandler::InitInputContext(this, mInputContext);
+
+  // Query for command button metric data for rendering the titlebar. We
+  // only do this once on the first window that has an actual titlebar
+  if (ShouldCacheTitleBarInfo(mWindowType, mBorderStyle)) {
+    nsUXThemeData::UpdateTitlebarInfo(mWnd);
+  }
 
   static bool a11yPrimed = false;
   if (!a11yPrimed && mWindowType == WindowType::TopLevel) {

@@ -25,31 +25,33 @@
   }
 }
 
-@media (-moz-windows-accent-color-in-titlebar) or (-moz-windows-mica) {
-  :root[customtitlebar] {
-    @media (-moz-windows-mica) {
-      &:not([lwtheme]) {
-        background-color: transparent;
+@media (-echelon-os-style: windows10) and (-moz-windows-compositor: 1) {
+  @media (-moz-windows-accent-color-in-titlebar) or (-moz-windows-mica) {
+    :root[customtitlebar] {
+      @media (-moz-windows-mica) {
+        &:not([lwtheme]) {
+          background-color: transparent;
+        }
       }
-    }
 
-    /* stylelint-disable-next-line media-query-no-invalid */
-    @media (-moz-windows-mica) or (-moz-bool-pref: "browser.theme.windows.accent-color-in-tabs.enabled") {
-      &:not([lwtheme]) #TabsToolbar {
-        /* These colors match the Linux/HCM default button colors. We need to
-         * override these on the tabs toolbar because the accent color is
-         * arbitrary, so the hardcoded colors from browser-custom-colors might
-         * not provide sufficient contrast. */
-        --toolbarbutton-icon-fill: currentColor;
-        --toolbarbutton-hover-background: color-mix(in srgb, currentColor 17%, transparent);
-        --toolbarbutton-active-background: color-mix(in srgb, currentColor 30%, transparent);
+      /* stylelint-disable-next-line media-query-no-invalid */
+      @media (-moz-windows-mica) or (-moz-bool-pref: "browser.theme.windows.accent-color-in-tabs.enabled") {
+        &:not([lwtheme]) #TabsToolbar {
+          /* These colors match the Linux/HCM default button colors. We need to
+          * override these on the tabs toolbar because the accent color is
+          * arbitrary, so the hardcoded colors from browser-custom-colors might
+          * not provide sufficient contrast. */
+          --toolbarbutton-icon-fill: currentColor;
+          --toolbarbutton-hover-background: color-mix(in srgb, currentColor 17%, transparent);
+          --toolbarbutton-active-background: color-mix(in srgb, currentColor 30%, transparent);
+        }
       }
-    }
 
-    &[sizemode="normal"] #navigator-toolbox {
-      border-top: .5px solid ActiveBorder;
-      &:-moz-window-inactive {
-        border-top-color: InactiveBorder;
+      &[sizemode="normal"] #navigator-toolbox {
+        border-top: .5px solid ActiveBorder;
+        &:-moz-window-inactive {
+          border-top-color: InactiveBorder;
+        }
       }
     }
   }
@@ -57,14 +59,30 @@
 
 /* Titlebar */
 
+.browser-titlebar {
+  appearance: auto;
+  -moz-default-appearance: -moz-window-titlebar;
+
+  :root[sizemode="maximized"] & {
+    -moz-default-appearance: -moz-window-titlebar-maximized;
+  }
+}
+
 .titlebar-buttonbox {
-  appearance: none;
-  /* The button box must appear on top of the navigator-toolbox in order for
-   * click and hover mouse events to work properly for the button in the restored
-   * window state. Otherwise, elements in the navigator-toolbox, like the menubar,
-   * can swallow those events.
-   */
-  z-index: 1;
+  align-items: flex-start;
+}
+
+@media (-echelon-os-style: windows10) {
+  .titlebar-buttonbox {
+    appearance: none;
+    align-items: stretch;
+    /* The button box must appear on top of the navigator-toolbox in order for
+    * click and hover mouse events to work properly for the button in the restored
+    * window state. Otherwise, elements in the navigator-toolbox, like the menubar,
+    * can swallow those events.
+    */
+    z-index: 1;
+  }
 }
 
 .titlebar-buttonbox-container {
@@ -73,124 +91,135 @@
 
 /* Window control buttons */
 
-.titlebar-button {
-  appearance: none;
-  border: none;
-  margin: 0;
-  padding: 8px 17px;
-  -moz-context-properties: stroke;
-  stroke: currentColor;
-
-  /* Win10's tablet mode is non-windowed -- windows can't be moved or resized
-     freely. In theory "minimize" might still make sense, but for simplicity we
-     just hide everything but "close".
-
-     (This is not called for in Win11's tablet mode, which _is_ windowed.)
-  */
-  :root[win10-tablet-mode] &:not(.titlebar-close) {
-    display: none;
-  }
-
-  &:focus-visible {
-    outline: var(--focus-outline);
-    outline-offset: var(--focus-outline-inset);
-  }
-
-  > .toolbarbutton-icon {
-    width: 12px;
-    height: 12px;
-
-    &:-moz-locale-dir(rtl) {
-      transform: scaleX(-1);
-    }
-  }
-}
-
 .titlebar-min {
-  /* Even though we use appearance: none, -moz-default-appearance is necessary
-   * for Windows 11's "snap layouts" feature, see
-   * DealWithWindowsAppearanceHacks */
   -moz-default-appearance: -moz-window-button-minimize;
-  list-style-image: url(chrome://browser/skin/window-controls/minimize.svg);
 }
 
 .titlebar-max {
   -moz-default-appearance: -moz-window-button-maximize;
-  list-style-image: url(chrome://browser/skin/window-controls/maximize.svg);
 }
 
 .titlebar-restore {
   -moz-default-appearance: -moz-window-button-restore;
-  list-style-image: url(chrome://browser/skin/window-controls/restore.svg);
 }
 
 .titlebar-close {
   -moz-default-appearance: -moz-window-button-close;
-  list-style-image: url(chrome://browser/skin/window-controls/close.svg);
 }
 
-:root[lwtheme-image] {
+@media (-echelon-os-style: windows10) {
   .titlebar-button {
-    -moz-context-properties: unset;
-  }
-  .titlebar-min {
-    list-style-image: url(chrome://browser/skin/window-controls/minimize-themes.svg);
-  }
-  .titlebar-max {
-    list-style-image: url(chrome://browser/skin/window-controls/maximize-themes.svg);
-  }
-  .titlebar-restore {
-    list-style-image: url(chrome://browser/skin/window-controls/restore-themes.svg);
-  }
-  .titlebar-close {
-    list-style-image: url(chrome://browser/skin/window-controls/close-themes.svg);
-  }
-}
+    appearance: none;
+    border: none;
+    margin: 0;
+    padding: 8px 17px;
+    -moz-context-properties: stroke;
+    stroke: currentColor;
 
-@media not (prefers-contrast) {
-  .titlebar-button:hover {
-    background-color: light-dark(hsla(0,0%,0%,.12), hsla(0,0%,100%,.22));
+    /* Win10's tablet mode is non-windowed -- windows can't be moved or resized
+      freely. In theory "minimize" might still make sense, but for simplicity we
+      just hide everything but "close".
 
-    &:active {
-      background-color: light-dark(hsla(0,0%,0%,.22), hsla(0,0%,100%,.32));
+      (This is not called for in Win11's tablet mode, which _is_ windowed.)
+    */
+    :root[win10-tablet-mode] &:not(.titlebar-close) {
+      display: none;
     }
-  }
 
-  .titlebar-close:hover {
-    stroke: white;
-    background-color: hsl(355,86%,49%);
-
-    &:active {
-      background-color: hsl(355,82%,69%);
+    &:focus-visible {
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-inset);
     }
-  }
-}
 
-@media (prefers-contrast) {
-  .titlebar-button {
-    background-color: -moz-field;
-    stroke: ButtonText;
+    > .toolbarbutton-icon {
+      width: 12px;
+      height: 12px;
 
-    &:hover {
-      background-color: SelectedItem;
-      stroke: SelectedItemText;
+      &:-moz-locale-dir(rtl) {
+        transform: scaleX(-1);
+      }
     }
   }
 
   .titlebar-min {
-    list-style-image: url(chrome://browser/skin/window-controls/minimize-highcontrast.svg);
+    list-style-image: url(chrome://browser/skin/window-controls/minimize.svg);
   }
 
   .titlebar-max {
-    list-style-image: url(chrome://browser/skin/window-controls/maximize-highcontrast.svg);
+    list-style-image: url(chrome://browser/skin/window-controls/maximize.svg);
   }
 
   .titlebar-restore {
-    list-style-image: url(chrome://browser/skin/window-controls/restore-highcontrast.svg);
+    list-style-image: url(chrome://browser/skin/window-controls/restore.svg);
   }
 
   .titlebar-close {
-    list-style-image: url(chrome://browser/skin/window-controls/close-highcontrast.svg);
+    list-style-image: url(chrome://browser/skin/window-controls/close.svg);
+  }
+
+  :root[lwtheme-image] {
+    .titlebar-button {
+      -moz-context-properties: unset;
+    }
+    .titlebar-min {
+      list-style-image: url(chrome://browser/skin/window-controls/minimize-themes.svg);
+    }
+    .titlebar-max {
+      list-style-image: url(chrome://browser/skin/window-controls/maximize-themes.svg);
+    }
+    .titlebar-restore {
+      list-style-image: url(chrome://browser/skin/window-controls/restore-themes.svg);
+    }
+    .titlebar-close {
+      list-style-image: url(chrome://browser/skin/window-controls/close-themes.svg);
+    }
+  }
+
+  @media not (prefers-contrast) {
+    .titlebar-button:hover {
+      background-color: light-dark(hsla(0,0%,0%,.12), hsla(0,0%,100%,.22));
+
+      &:active {
+        background-color: light-dark(hsla(0,0%,0%,.22), hsla(0,0%,100%,.32));
+      }
+    }
+
+    .titlebar-close:hover {
+      stroke: white;
+      background-color: hsl(355,86%,49%);
+
+      &:active {
+        background-color: hsl(355,82%,69%);
+      }
+    }
+  }
+
+  @media (prefers-contrast) {
+    .titlebar-button {
+      background-color: -moz-field;
+      stroke: ButtonText;
+
+      &:hover {
+        background-color: SelectedItem;
+        stroke: SelectedItemText;
+      }
+    }
+
+    .titlebar-min {
+      list-style-image: url(chrome://browser/skin/window-controls/minimize-highcontrast.svg);
+    }
+
+    .titlebar-max {
+      list-style-image: url(chrome://browser/skin/window-controls/maximize-highcontrast.svg);
+    }
+
+    .titlebar-restore {
+      list-style-image: url(chrome://browser/skin/window-controls/restore-highcontrast.svg);
+    }
+
+    .titlebar-close {
+      list-style-image: url(chrome://browser/skin/window-controls/close-highcontrast.svg);
+    }
   }
 }
 

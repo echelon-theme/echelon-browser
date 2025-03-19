@@ -233,16 +233,6 @@ body {
 
 .browser-titlebar {
   -moz-window-dragging: drag;
-
-  :root[customtitlebar] &,
-  :root[customtitlebar] & #urlbar:popover-open {
-    will-change: opacity;
-    transition: opacity var(--inactive-window-transition);
-
-    &:-moz-window-inactive {
-      opacity: var(--inactive-titlebar-opacity);
-    }
-  }
 }
 
 .titlebar-buttonbox-container {

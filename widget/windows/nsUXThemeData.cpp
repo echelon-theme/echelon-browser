@@ -13,6 +13,7 @@
 #include "nsToolkit.h"
 #include "nsUXThemeConstants.h"
 #include "gfxWindowsPlatform.h"
+#include "nsLookAndFeel.h"
 
 using namespace mozilla;
 using namespace mozilla::widget;
@@ -173,7 +174,7 @@ void nsUXThemeData::UpdateTitlebarInfo(HWND aWnd) {
   if (!aWnd) return;
 
   if (!sTitlebarInfoPopulatedAero &&
-      gfxWindowsPlatform::GetPlatform()->DwmCompositionEnabled()) {
+      nsLookAndFeel::GetInt(nsLookAndFeel::IntID::DWMCompositor)) {
     RECT captionButtons;
     if (SUCCEEDED(DwmGetWindowAttribute(aWnd, DWMWA_CAPTION_BUTTON_BOUNDS,
                                         &captionButtons,
@@ -191,7 +192,7 @@ void nsUXThemeData::UpdateTitlebarInfo(HWND aWnd) {
   }
 
   // NB: sTitlebarInfoPopulatedThemed is always true pre-vista.
-  if (sTitlebarInfoPopulatedThemed) return;
+  if (sTitlebarInfoPopulatedThemed || nsLookAndFeel::GetInt(nsLookAndFeel::IntID::DWMCompositor)) return;
 
   // Query a temporary, visible window with command buttons to get
   // the right metrics.
@@ -223,7 +224,7 @@ void nsUXThemeData::UpdateTitlebarInfo(HWND aWnd) {
   // get the wrong information if the window isn't activated, so we have to:
   if (sThemeId == WindowsTheme::AeroLite ||
       (sThemeId == WindowsTheme::Aero &&
-       !gfxWindowsPlatform::GetPlatform()->DwmCompositionEnabled())) {
+       !nsLookAndFeel::GetInt(nsLookAndFeel::IntID::DWMCompositor))) {
     showType = SW_SHOW;
   }
   ShowWindow(hWnd, showType);

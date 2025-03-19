@@ -1529,11 +1529,6 @@ RENDER_AGAIN:
     // is the middle section.
     widgetRect.left -= GetSystemMetrics(SM_CXFRAME);
     widgetRect.right += GetSystemMetrics(SM_CXFRAME);
-  } else if (aAppearance == StyleAppearance::MozWindowTitlebarMaximized) {
-    // The origin of the window is off screen when maximized and windows
-    // doesn't compensate for this in rendering the background. Push the
-    // top of the bitmap down by SM_CYFRAME so we get the full graphic.
-    widgetRect.top += GetSystemMetrics(SM_CYFRAME);
   } else if (aAppearance == StyleAppearance::Tab) {
     // For left edge and right edge tabs, we need to adjust the widget
     // rects and clip rects so that the edges don't get drawn.
@@ -1559,6 +1554,13 @@ RENDER_AGAIN:
         // back.
         widgetRect.left -= edgeSize;
     }
+  } else if (aAppearance == StyleAppearance::MozWindowButtonMinimize) {
+    OffsetBackgroundRect(widgetRect, CAPTIONBUTTON_MINIMIZE);
+  } else if (aAppearance == StyleAppearance::MozWindowButtonMaximize ||
+             aAppearance == StyleAppearance::MozWindowButtonRestore) {
+    OffsetBackgroundRect(widgetRect, CAPTIONBUTTON_RESTORE);
+  } else if (aAppearance == StyleAppearance::MozWindowButtonClose) {
+    OffsetBackgroundRect(widgetRect, CAPTIONBUTTON_CLOSE);
   }
 
   // widgetRect is the bounding box for a widget, yet the scale track is only
@@ -1973,7 +1975,8 @@ bool nsNativeThemeWin::GetWidgetPadding(nsDeviceContext* aContext,
     // adding padding to the top of the window that is the size of the caption
     // area and then "removing" it when calculating the client area for
     // WM_NCCALCSIZE.  See bug 618353,
-    if (aAppearance == StyleAppearance::MozWindowTitlebarMaximized) {
+    if (aAppearance == StyleAppearance::MozWindowTitlebarMaximized &&
+        nsLookAndFeel::GetInt(nsLookAndFeel::IntID::DWMCompositor)) {
       nsCOMPtr<nsIWidget> rootWidget;
       if (WinUtils::HasSystemMetricsForDpi()) {
         rootWidget = aFrame->PresContext()->GetRootWidget();
