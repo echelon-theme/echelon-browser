@@ -220,18 +220,15 @@ body {
   background-color: transparent;
   color: inherit;
 
-  /* stylelint-disable-next-line media-query-no-invalid */
-  @media not (-moz-bool-pref: "sidebar.verticalTabs") {
-    &:not(.browser-titlebar) {
-      background-color: var(--toolbar-bgcolor);
-      color: var(--toolbar-color);
-    }
+  &:not(.titlebar-color) {
+    background-color: var(--toolbar-bgcolor);
+    color: var(--toolbar-color);
   }
 }
 
 /* Title bar */
 
-.browser-titlebar {
+#titlebar {
   -moz-window-dragging: drag;
 }
 
@@ -322,6 +319,10 @@ body {
   appearance: auto;
   -moz-default-appearance: -moz-window-button-box;
   position: relative;
+
+  :root[sizemode="maximized"] & {
+    -moz-default-appearance: -moz-window-button-box-maximized;
+  }
 
   :root:not([customtitlebar], [sizemode=fullscreen]) & {
     display: none;

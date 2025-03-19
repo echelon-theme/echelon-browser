@@ -5,9 +5,10 @@
 <toolbox id="navigator-toolbox" class="browser-toolbox-background">
   <script src="chrome://browser/content/navigator-toolbox.js" />
 
+  <vbox id="titlebar">
   <!-- Menu -->
   <toolbar type="menubar" id="toolbar-menubar"
-           class="browser-toolbar chromeclass-menubar browser-titlebar"
+           class="browser-toolbar titlebar-color chromeclass-menubar"
            customizable="true"
            mode="icons"
            context="toolbar-context-menu">
@@ -21,7 +22,7 @@
   </toolbar>
 
   <toolbar id="TabsToolbar"
-           class="browser-toolbar browser-titlebar"
+           class="browser-toolbar titlebar-color"
            fullscreentoolbar="true"
            customizable="true"
            customizationtarget="TabsToolbar-customization-target"
@@ -104,6 +105,8 @@
 #include titlebar-items.inc.xhtml
 
   </toolbar>
+
+  </vbox>
 
   <toolbar id="nav-bar"
            class="browser-toolbar chromeclass-location"

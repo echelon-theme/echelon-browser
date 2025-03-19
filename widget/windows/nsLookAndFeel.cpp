@@ -439,7 +439,9 @@ nsresult nsLookAndFeel::NativeGetInt(IntID aID, int32_t& aResult) {
       aResult = !nsUXThemeData::IsAppThemed();
       break;
     case IntID::DWMCompositor:
-      if (StaticPrefs::echelon_theme_no_composition()) {
+      // Classic theme should always report no composition.
+      if (!nsUXThemeData::IsAppThemed() ||
+          StaticPrefs::echelon_theme_no_composition()) {
         aResult = 0;
         break;
       }

@@ -265,6 +265,15 @@ bool Gecko_MediaFeatures_MatchesPlatform(StylePlatform aPlatform) {
 }
 
 bool Gecko_MediaFeatures_MatchesOSStyle(StyleOSStyle aOSStyle) {
+  static bool callbackRegistered = false;
+  if (!callbackRegistered) {
+    callbackRegistered = NS_SUCCEEDED(Preferences::RegisterCallback(
+      [](const char* aPrefName, void*) {
+        LookAndFeel::NotifyChangedAllWindows(
+          widget::ThemeChangeKind::MediaQueriesOnly);
+      },
+      "echelon.theme.os-style"));
+  }
   uint32_t osStyle = StaticPrefs::echelon_theme_os_style();
   if (osStyle > (uint32_t)StyleOSStyle::Windows10)
     osStyle = (uint32_t)StyleOSStyle::Windows10;
@@ -272,6 +281,15 @@ bool Gecko_MediaFeatures_MatchesOSStyle(StyleOSStyle aOSStyle) {
 }
 
 bool Gecko_MediaFeatures_MatchesEchelonStyle(StyleEchelonStyle aEchelonStyle) {
+  static bool callbackRegistered = false;
+  if (!callbackRegistered) {
+    callbackRegistered = NS_SUCCEEDED(Preferences::RegisterCallback(
+      [](const char* aPrefName, void*) {
+        LookAndFeel::NotifyChangedAllWindows(
+          widget::ThemeChangeKind::MediaQueriesOnly);
+      },
+      "echelon.theme.style"));
+  }
   uint32_t echelonStyle = StaticPrefs::echelon_theme_style();
   return echelonStyle >= (uint32_t)aEchelonStyle;
 }

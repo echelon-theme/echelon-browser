@@ -137,7 +137,7 @@
   min-height: 0;
 }
 
-.browser-titlebar,
+#titlebar,
 #main-menubar {
   appearance: none;
   background-color: transparent;
