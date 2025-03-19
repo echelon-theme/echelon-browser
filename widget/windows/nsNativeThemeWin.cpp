@@ -3523,13 +3523,9 @@ RENDER_AGAIN:
     case StyleAppearance::MozWindowTitlebar:
     case StyleAppearance::MozWindowTitlebarMaximized: {
       RECT rect = widgetRect;
-      int32_t offset = GetSystemMetrics(SM_CXFRAME);
 
       // first fill the area to the color of the window background
       ::FillRect(hdc, &rect, (HBRUSH)(COLOR_3DFACE + 1));
-
-      // inset the caption area so it doesn't overflow.
-      rect.top += offset;
       // if enabled, draw a gradient titlebar background, otherwise
       // fill with a solid color.
       BOOL bFlag = TRUE;

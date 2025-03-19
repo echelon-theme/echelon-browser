@@ -72,7 +72,7 @@
   align-items: flex-start;
 }
 
-@media (-echelon-os-style: windows10) {
+@media (-echelon-os-style: windows10) and (-moz-windows-compositor: 1) {
   .titlebar-buttonbox {
     appearance: none;
     align-items: stretch;
@@ -107,7 +107,13 @@
   -moz-default-appearance: -moz-window-button-close;
 }
 
-@media (-echelon-os-style: windows10) {
+@media (-moz-windows-classic: 0) and (-moz-windows-compositor: 0) {
+  .titlebar-min {
+    margin-inline-end: 2px;
+  }
+}
+
+@media (-echelon-os-style: windows10) and (-moz-windows-compositor: 1) {
   .titlebar-button {
     appearance: none;
     border: none;
