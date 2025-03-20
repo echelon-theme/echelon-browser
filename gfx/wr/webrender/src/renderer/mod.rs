@@ -3463,7 +3463,7 @@ impl Renderer {
 
         for (idx, tile) in composite_state.tiles.iter().enumerate() {
             // Clear tiles overwrite whatever is under them, so they are treated as opaque.
-            let is_opaque = tile.kind != TileKind::Alpha;
+            let is_opaque = tile.kind == TileKind::Opaque;
 
             let device_tile_box = composite_state.get_device_rect(
                 &tile.local_rect,
@@ -4740,9 +4740,9 @@ impl Renderer {
             // Invalidate any native surface tiles that might be updated by passes.
             if !frame.has_been_rendered {
                 for tile in &frame.composite_state.tiles {
-                    if tile.kind == TileKind::Clear {
-                        continue;
-                    }
+                    //if tile.kind == TileKind::Clear {
+                    //    continue;
+                    //}
                     if !tile.local_dirty_rect.is_empty() {
                         if let CompositeTileSurface::Texture { surface: ResolvedSurfaceTexture::Native { id, .. } } = tile.surface {
                             let valid_rect = frame.composite_state.get_surface_rect(
