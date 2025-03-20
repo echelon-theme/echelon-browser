@@ -3502,6 +3502,7 @@ impl Renderer {
                     // Windows 8. They clobber what's under them so they can be treated as opaque,
                     // but require a different blend state so they will be rendered after the opaque
                     // tiles and before transparent ones.
+                    occlusion.add(&rect, is_opaque, idx); // i was missing this one, please test - erizur
                     clear_tiles.push(occlusion::Item { rectangle: rect, key: idx });
                 }
             }
