@@ -33,24 +33,39 @@
 }
 
 .message-icon {
-  list-style-image: url("chrome://global/skin/icons/info.svg");
+  list-style-image: url("chrome://global/skin/icons/information-32.png");
 }
 
 .alert-dialog #infoIcon,
 .alert-icon {
-  list-style-image: url("chrome://global/skin/icons/warning.svg");
-  fill: #ffa436;
+  list-style-image: url("chrome://global/skin/icons/Warning.png");
 }
 
 .error-icon {
-  list-style-image: url("chrome://global/skin/icons/error.svg");
-  fill: #e22850;
+  list-style-image: url("chrome://global/skin/icons/Error.png");
 }
 
 .question-icon {
-  list-style-image: url("chrome://global/skin/icons/help.svg");
-  -moz-context-properties: fill, fill-opacity;
-  fill-opacity: 0.8;
+  list-style-image: url("chrome://global/skin/icons/Question.png");
+}
+
+@media (-echelon-os-style: windowsxp) {
+  .message-icon {
+    list-style-image: url("chrome://global/skin/icons/information-32-XP.png");
+  }
+  
+  .alert-dialog #infoIcon,
+  .alert-icon {
+    list-style-image: url("chrome://global/skin/icons/Warning-XP.png");
+  }
+  
+  .error-icon {
+    list-style-image: url("chrome://global/skin/icons/Error-XP.png");
+  }
+  
+  .question-icon {
+    list-style-image: url("chrome://global/skin/icons/Question-XP.png");
+  }
 }
 
 /* XXX(ntim): [mode="text"] is only used by comm-central */

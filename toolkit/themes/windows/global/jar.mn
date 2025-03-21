@@ -14,8 +14,17 @@ toolkit.jar:
   skin/classic/global/printPageSetup.css
   skin/classic/global/richlistbox.css
   skin/classic/global/toolbar.css
+  skin/classic/global/icons/Error.png                      (icons/Error.png)
+  skin/classic/global/icons/Error-XP.png                   (icons/Error-XP.png)
+  skin/classic/global/icons/information-32.png             (icons/information-32.png)
+  skin/classic/global/icons/information-32-XP.png          (icons/information-32-XP.png)
   skin/classic/global/icons/Landscape.png                  (icons/Landscape.png)
   skin/classic/global/icons/menu-check.svg                 (icons/menu-check.svg)
   skin/classic/global/icons/Portrait.png                   (icons/Portrait.png)
+  skin/classic/global/icons/Question.png                   (icons/Question.png)
+  skin/classic/global/icons/Question-XP.png                (icons/Question-XP.png)
+  skin/classic/global/icons/Warning.png                    (icons/Warning.png)
   skin/classic/global/icons/warning-large.png              (icons/warning-large.png)
+  skin/classic/global/icons/warning-large-XP.png           (icons/warning-large-XP.png)
+  skin/classic/global/icons/Warning-XP.png                 (icons/Warning-XP.png)
   skin/classic/global/in-content/common.css                (in-content/common.css)
