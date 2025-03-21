@@ -9,8 +9,6 @@
 // This is loaded into all browser windows. Wrap in a block to prevent
 // leaking to window scope.
 {
-  const TAB_PREVIEW_PREF = "browser.tabs.hoverPreview.enabled";
-
   const DIRECTION_BACKWARD = -1;
   const DIRECTION_FORWARD = 1;
 
@@ -55,7 +53,6 @@
       this.addEventListener("TabAttrModified", this);
       this.addEventListener("TabHide", this);
       this.addEventListener("TabShow", this);
-      this.addEventListener("TabHoverStart", this);
       this.addEventListener("TabHoverEnd", this);
       this.addEventListener("TabGroupExpand", this);
       this.addEventListener("TabGroupCollapse", this);
@@ -199,13 +196,7 @@
       if (gMultiProcessBrowser) {
         this.tabbox.tabpanels.setAttribute("async", "true");
       }
-
-      XPCOMUtils.defineLazyPreferenceGetter(
-        this,
-        "_showCardPreviews",
-        TAB_PREVIEW_PREF,
-        false
-      );
+      
       this.tooltip = "tabbrowser-tab-tooltip";
     }
 
@@ -263,22 +254,6 @@
       if (event.target.soundPlaying) {
         this._hiddenSoundPlayingStatusChanged(event.target);
       }
-    }
-
-    on_TabHoverStart(event) {
-      if (!this._showCardPreviews) {
-        return;
-      }
-      if (!this.previewPanel) {
-        // load the tab preview component
-        const TabHoverPreviewPanel = ChromeUtils.importESModule(
-          "chrome://browser/content/tabbrowser/tab-hover-preview.mjs"
-        ).default;
-        this.previewPanel = new TabHoverPreviewPanel(
-          document.getElementById("tab-preview-panel")
-        );
-      }
-      this.previewPanel.activate(event.target);
     }
 
     on_TabHoverEnd(event) {

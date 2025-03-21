@@ -1041,9 +1041,6 @@ pref("browser.tabs.tooltipsShowPidAndActiveness", true);
 pref("browser.tabs.tooltipsShowPidAndActiveness", false);
 #endif
 
-pref("browser.tabs.hoverPreview.enabled", true);
-pref("browser.tabs.hoverPreview.showThumbnails", true);
-
 #ifdef NIGHTLY_BUILD
 pref("browser.tabs.groups.enabled", true);
 #else
