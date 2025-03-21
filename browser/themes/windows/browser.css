@@ -81,7 +81,6 @@
 @media (-echelon-os-style: windows10) and (-moz-windows-compositor: 1) {
   .titlebar-buttonbox {
     appearance: none;
-    align-items: stretch;
     /* The button box must appear on top of the navigator-toolbox in order for
     * click and hover mouse events to work properly for the button in the restored
     * window state. Otherwise, elements in the navigator-toolbox, like the menubar,
