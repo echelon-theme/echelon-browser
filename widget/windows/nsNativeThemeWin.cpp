@@ -1447,7 +1447,6 @@ nsNativeThemeWin::DrawWidgetBackground(gfxContext* aContext, nsIFrame* aFrame,
                                        aDirtyRect);
 
   // ^^ without the right sdk, assume xp theming and fall through.
-  // ^^ without the right sdk, assume xp theming and fall through.
   if (nsLookAndFeel::GetInt(nsLookAndFeel::IntID::DWMCompositor)) {
     switch (aAppearance) {
       case StyleAppearance::MozWindowTitlebar:
