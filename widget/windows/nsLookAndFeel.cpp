@@ -749,7 +749,7 @@ char16_t nsLookAndFeel::GetPasswordCharacterImpl() {
   return UNICODE_BLACK_CIRCLE_CHAR;
 }
 
-static nscolor GetAccentColorText(const nscolor aAccentColor) {
+static nscolor GetAccentColorText(const nscolor aAccentColor, bool aActive = true) {
   // We want the color that we return for text that will be drawn over
   // a background that has the accent color to have good contrast with
   // the accent color.  Windows itself uses either white or black text
@@ -761,14 +761,16 @@ static nscolor GetAccentColorText(const nscolor aAccentColor) {
   float luminance = (NS_GET_R(aAccentColor) * 2 + NS_GET_G(aAccentColor) * 5 +
                      NS_GET_B(aAccentColor)) /
                     8;
-  return luminance <= 128 ? NS_RGB(255, 255, 255) : NS_RGB(0, 0, 0);
+  // Inactive accent text is 40% the opacity of the original.
+  const unsigned char alpha = aActive ? 255 : 102;
+  return luminance <= 128 ? NS_RGBA(255, 255, 255, alpha) : NS_RGBA(0, 0, 0, alpha);
 }
 
-static Maybe<nscolor> GetAccentColorText(const Maybe<nscolor>& aAccentColor) {
+static Maybe<nscolor> GetAccentColorText(const Maybe<nscolor>& aAccentColor, bool aActive = true) {
   if (!aAccentColor) {
     return Nothing();
   }
-  return Some(GetAccentColorText(*aAccentColor));
+  return Some(GetAccentColorText(*aAccentColor, aActive));
 }
 
 nscolor nsLookAndFeel::GetColorForSysColorIndex(int index) {
@@ -787,19 +789,6 @@ auto nsLookAndFeel::ComputeTitlebarColors() -> TitlebarColors {
   result.mInactiveLight = {GetColorForSysColorIndex(COLOR_INACTIVECAPTION),
                            GetColorForSysColorIndex(COLOR_INACTIVECAPTIONTEXT),
                            GetColorForSysColorIndex(COLOR_INACTIVEBORDER)};
-
-  if (!nsUXThemeData::IsHighContrastOn()) {
-    // Use our non-native colors.
-    result.mActiveLight = {
-        GetStandinForNativeColor(ColorID::Activecaption, ColorScheme::Light),
-        GetStandinForNativeColor(ColorID::Captiontext, ColorScheme::Light),
-        GetStandinForNativeColor(ColorID::Activeborder, ColorScheme::Light)};
-    result.mInactiveLight = {
-        GetStandinForNativeColor(ColorID::Inactivecaption, ColorScheme::Light),
-        GetStandinForNativeColor(ColorID::Inactivecaptiontext,
-                                 ColorScheme::Light),
-        GetStandinForNativeColor(ColorID::Inactiveborder, ColorScheme::Light)};
-  }
 
   // Our dark colors are always non-native.
   result.mActiveDark = {*GenericDarkColor(ColorID::Activecaption),
@@ -829,7 +818,7 @@ auto nsLookAndFeel::ComputeTitlebarColors() -> TitlebarColors {
   }
 
   result.mAccentInactive = dwmKey.GetValueAsDword(u"AccentColorInactive"_ns);
-  result.mAccentInactiveText = GetAccentColorText(result.mAccentInactive);
+  result.mAccentInactiveText = GetAccentColorText(result.mAccentInactive, false);
 
   if (WinUtils::MicaEnabled()) {
     // Use transparent titlebar backgrounds when using mica.
