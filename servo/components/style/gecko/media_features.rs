@@ -571,7 +571,7 @@ fn eval_moz_platform(_: &Context, query_value: Option<Platform>) -> bool {
 #[repr(u8)]
 pub enum OSStyle {
     /// Echelon will be styled like Firefox on Windows XP.
-    WindowsXP,
+    Windowsxp,
     /// Echelon will be styled like Firefox on Windows Vista/7.
     Windows7,
     /// Echelon will be styled like Firefox on Windows 8.
