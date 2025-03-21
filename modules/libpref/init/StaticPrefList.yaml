@@ -1696,14 +1696,6 @@
   mirror: always
   rust: true
 
-# Whether the firefox titlebar respects the
-# -moz-windows-accent-color-in-titlebar setting on the tab strip.
-- name: browser.theme.windows.accent-color-in-tabs.enabled
-  type: RelaxedAtomicBool
-  value: false
-  mirror: always
-  rust: true
-
 # Blocked plugin content
 - name: browser.safebrowsing.blockedURIs.enabled
   type: bool
