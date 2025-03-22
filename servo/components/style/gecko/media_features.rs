@@ -727,7 +727,7 @@ macro_rules! lnf_int_feature {
 /// to support new types in these entries and (2) ensuring that either
 /// nsPresContext::MediaFeatureValuesChanged is called when the value that
 /// would be returned by the evaluator function could change.
-pub static MEDIA_FEATURES: [QueryFeatureDescription; 65] = [
+pub static MEDIA_FEATURES: [QueryFeatureDescription; 67] = [
     feature!(
         atom!("width"),
         AllowsRanges::Yes,
@@ -1037,6 +1037,8 @@ pub static MEDIA_FEATURES: [QueryFeatureDescription; 65] = [
         atom!("-moz-windows-accent-color-in-titlebar"),
         WindowsAccentColorInTitlebar
     ),
+    lnf_int_feature!(atom!("-moz-windows-dark-titlebar"), WindowsDarkTitlebar),
+    lnf_int_feature!(atom!("-moz-windows-dark-inactive-titlebar"), WindowsDarkInactiveTitlebar),
     lnf_int_feature!(atom!("-moz-windows-compositor"), DWMCompositor),
     lnf_int_feature!(atom!("-moz-windows-classic"), WindowsClassic),
     lnf_int_feature!(atom!("-moz-windows-mica"), WindowsMica),

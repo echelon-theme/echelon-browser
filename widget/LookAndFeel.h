@@ -105,6 +105,22 @@ class LookAndFeel {
     WindowsAccentColorInTitlebar,
 
     /*
+     * A Boolean value to determine whether the active titlebar is dark.
+     *
+     * The value of this metric is not used on other platforms. These platforms
+     * should return NS_ERROR_NOT_IMPLEMENTED when queried for this metric.
+     */
+    WindowsDarkTitlebar,
+
+    /*
+     * A Boolean value to determine whether the inactive titlebar is dark.
+     *
+     * The value of this metric is not used on other platforms. These platforms
+     * should return NS_ERROR_NOT_IMPLEMENTED when queried for this metric.
+     */
+    WindowsDarkInactiveTitlebar,
+
+    /*
      * A Boolean value to determine whether the DWM compositor is being used
      *
      * This metric is not used on non-Windows platforms. These platforms

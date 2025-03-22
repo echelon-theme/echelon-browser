@@ -66,6 +66,29 @@ static bool SystemWantsDarkTheme() {
   return !light;
 }
 
+// We want the color that we return for text that will be drawn over
+// a background that has the accent color to have good contrast with
+// the accent color.  Windows itself uses either white or black text
+// depending on how light or dark the accent color is.  We do the same
+// here based on the luminance of the accent color with a threshhold
+// value.  This algorithm should match what Windows does.  It comes from:
+//
+// https://docs.microsoft.com/en-us/windows/uwp/style/color
+static bool IsAccentColorDark(const nscolor aAccentColor)
+{
+  float luminance = (NS_GET_R(aAccentColor) * 2 + NS_GET_G(aAccentColor) * 5 +
+                     NS_GET_B(aAccentColor)) /
+                    8;
+  return luminance <= 128;
+}
+
+static bool IsAccentColorDark(Maybe<nscolor>& aAccentColor) {
+  if (!aAccentColor) {
+    return false;
+  }
+  return IsAccentColorDark(*aAccentColor);
+}
+
 uint32_t nsLookAndFeel::SystemColorFilter() {
   if (NS_WARN_IF(!mColorFilterWatcher)) {
     return 0;
@@ -450,6 +473,16 @@ nsresult nsLookAndFeel::NativeGetInt(IntID aID, int32_t& aResult) {
     case IntID::WindowsAccentColorInTitlebar:
       aResult = mTitlebarColors.mUseAccent;
       break;
+    case IntID::WindowsDarkTitlebar:
+    case IntID::WindowsDarkInactiveTitlebar:
+      if (mTitlebarColors.mUseAccent) {
+        aResult = IsAccentColorDark(
+          aID == IntID::WindowsDarkInactiveTitlebar ? mTitlebarColors.mAccentInactive
+          : mTitlebarColors.mAccent);
+        break;
+      }
+      aResult = SystemWantsDarkTheme();
+      break;
     case IntID::WindowsMica:
       aResult = WinUtils::MicaEnabled();
       break;
@@ -750,20 +783,10 @@ char16_t nsLookAndFeel::GetPasswordCharacterImpl() {
 }
 
 static nscolor GetAccentColorText(const nscolor aAccentColor, bool aActive = true) {
-  // We want the color that we return for text that will be drawn over
-  // a background that has the accent color to have good contrast with
-  // the accent color.  Windows itself uses either white or black text
-  // depending on how light or dark the accent color is.  We do the same
-  // here based on the luminance of the accent color with a threshhold
-  // value.  This algorithm should match what Windows does.  It comes from:
-  //
-  // https://docs.microsoft.com/en-us/windows/uwp/style/color
-  float luminance = (NS_GET_R(aAccentColor) * 2 + NS_GET_G(aAccentColor) * 5 +
-                     NS_GET_B(aAccentColor)) /
-                    8;
+  
   // Inactive accent text is 40% the opacity of the original.
   const unsigned char alpha = aActive ? 255 : 102;
-  return luminance <= 128 ? NS_RGBA(255, 255, 255, alpha) : NS_RGBA(0, 0, 0, alpha);
+  return IsAccentColorDark(aAccentColor) ? NS_RGBA(255, 255, 255, alpha) : NS_RGBA(0, 0, 0, alpha);
 }
 
 static Maybe<nscolor> GetAccentColorText(const Maybe<nscolor>& aAccentColor, bool aActive = true) {

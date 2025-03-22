@@ -118,6 +118,10 @@
     -moz-context-properties: stroke;
     stroke: currentColor;
 
+    &:not(:active) {
+      transition: background-color .167s;
+    }
+
     &[disabled] {
       color: inherit;
       background-color: transparent !important;
@@ -187,20 +191,51 @@
   }
 
   @media not (prefers-contrast) {
+    :root[lwtheme] {
+      .titlebar-button:hover {
+        background-color: light-dark(hsla(0,0%,0%,.12), hsla(0,0%,100%,.22));
+
+        &:active {
+          background-color: light-dark(hsla(0,0%,0%,.22), hsla(0,0%,100%,.32));
+        }
+      }
+    }
+
     .titlebar-button:hover {
-      background-color: light-dark(hsla(0,0%,0%,.12), hsla(0,0%,100%,.22));
+      background-color: hsla(0,0%,0%,.1);
 
       &:active {
-        background-color: light-dark(hsla(0,0%,0%,.22), hsla(0,0%,100%,.32));
+        background-color: hsla(0,0%,0%,.2);
+      }
+    }
+
+    @media (-moz-windows-dark-titlebar) {
+      .titlebar-button:hover {
+        background-color: hsla(0,0%,99%,.1);
+  
+        &:active {
+          background-color: hsla(0,0%,99%,.2);
+        }
+      }
+    }
+
+    @media (-moz-windows-dark-inactive-titlebar) {
+      .titlebar-button:hover:-moz-window-inactive {
+        background-color: hsla(0,0%,99%,.1);
+        stroke: white;
+  
+        &:active {
+          background-color: hsla(0,0%,99%,.2);
+        }
       }
     }
 
     .titlebar-close:hover {
       stroke: white;
-      background-color: hsl(355,86%,49%);
+      background-color: hsl(355,86%,49%) !important;
 
       &:active {
-        background-color: hsla(355,86%,49%,60%);
+        background-color: hsla(355,86%,49%,60%) !important;
       }
     }
   }

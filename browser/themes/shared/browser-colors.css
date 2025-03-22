@@ -108,10 +108,10 @@
 
     /* stylelint-disable-next-line media-query-no-invalid */
     @media not (-moz-windows-accent-color-in-titlebar) {
-      --toolbox-bgcolor: light-dark(rgb(255, 255, 2555), rgb(0, 0, 0));
+      --toolbox-bgcolor: light-dark(rgb(255, 255, 255), rgb(0, 0, 0));
       --toolbox-textcolor: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));
-      --toolbox-bgcolor-inactive: var(--toolbox-bgcolor);
-      --toolbox-textcolor-inactive: var(--toolbox-textcolor);
+      --toolbox-bgcolor-inactive: light-dark(rgb(255, 255, 255), rgb(43, 43, 43));
+      --toolbox-textcolor-inactive: light-dark(rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.4));
     }
 
     --toolbar-color: light-dark(rgb(21, 20, 26), rgb(251, 251, 254));
