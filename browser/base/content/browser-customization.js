@@ -68,6 +68,10 @@ var AutoHideMenubar = {
     return (this._node = document.getElementById("toolbar-menubar"));
   },
 
+  get _enabled() {
+    return this._node.getAttribute("autohide") == "true";
+  },
+
   _contextMenuListener: {
     contextMenu: null,
 
@@ -106,17 +110,35 @@ var AutoHideMenubar = {
 
   init() {
     this._node.addEventListener("toolbarvisibilitychange", this);
-    if (this._node.getAttribute("autohide") == "true") {
+    if (this._enabled) {
       this._enable();
+    }
+    Services.prefs.addObserver("echelon.theme.style", this);
+  },
+
+  observe(aSubject, aTopic, aData) {
+    if (aTopic == "nsPref:changed") {
+      AutoHideMenubar._updateTitlebar();
+    }
+  },
+
+  _updateTitlebar() {
+    if (this._enabled) {
+      CustomTitlebar.allowedBy("menubar", true);
+    } else {
+      let style = Services.prefs.getIntPref("echelon.theme.style");
+      CustomTitlebar.allowedBy("menubar", style >= 7);
     }
   },
 
   _updateState() {
-    if (this._node.getAttribute("autohide") == "true") {
+    if (this._enabled) {
       this._enable();
+      
     } else {
       this._disable();
     }
+    this._updateTitlebar();
   },
 
   _events: [
