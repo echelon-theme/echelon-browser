@@ -150,30 +150,29 @@ body {
     box-shadow: var(--content-area-shadow);
     border-bottom-color: var(--chrome-content-separator-color);
   }
-
-  /* Themes define a set of toolbox foreground and background colors which we
-   * want to use across the toolbox and sidebar areas. That happens via the
-   * .browser-toolbox-background class. It's hard to make a theme's background
-   * images work with something other than the toolbox, so for now we ignore
-   * them on other things like the sidebar that could have
-   * .browser-toolbox-background */
-  :root[lwtheme] & {
-    background-image: var(--lwt-additional-images);
-    background-repeat: var(--lwt-background-tiling);
-    background-position: var(--lwt-background-alignment);
-  }
-
-  /* When a theme defines both theme_frame and additional_backgrounds, show
-     the latter atop the former. */
-  :root[lwtheme-image] & {
-    background-image: var(--lwt-header-image), var(--lwt-additional-images);
-    background-repeat: no-repeat, var(--lwt-background-tiling);
-    background-position: right top, var(--lwt-background-alignment);
-  }
 }
 
-.browser-toolbox-background {
-  position: relative;
+/* Themes define a set of toolbox foreground and background colors which we
+ * want to use across the toolbox and sidebar areas. That happens via the
+ * .browser-toolbox-background class. It's hard to make a theme's background
+ * images work with something other than the toolbox, so for now we ignore
+ * them on other things like the sidebar that could have
+ * .browser-toolbox-background */
+:root[lwtheme] {
+  background-image: var(--lwt-additional-images);
+  background-repeat: var(--lwt-background-tiling);
+  background-position: var(--lwt-background-alignment);
+}
+
+/* When a theme defines both theme_frame and additional_backgrounds, show
+   the latter atop the former. */
+:root[lwtheme-image] {
+  background-image: var(--lwt-header-image), var(--lwt-additional-images);
+  background-repeat: no-repeat, var(--lwt-background-tiling);
+  background-position: right top, var(--lwt-background-alignment);
+}
+
+:root {
   background-color: var(--toolbox-bgcolor);
   color: var(--toolbox-textcolor);
 
@@ -182,20 +181,12 @@ body {
     color: var(--toolbox-textcolor-inactive);
   }
 
-  :root[customizing] & {
-    border-bottom-style: none;
-  }
-
-  /* stylelint-disable-next-line media-query-no-invalid */
+  /* Review later if we want macOS support. */
+  /*
   @media (-moz-platform: macos) and (-moz-bool-pref: "browser.theme.native-theme") {
-    /* Don't make the toolbox vibrant when in full-screen. macOS fullscreen has a
-     * native titlebar outside of the window (revealed on hover) anyways. */
     :root[customtitlebar]:not([lwtheme], [macOSNativeFullscreen]) & {
       background-color: transparent;
-
-      /* This is conceptually a background, but putting this on a
-       * pseudo-element avoids it from suppressing the chrome-content separator
-       * border, etc */
+      
       &::after {
         -moz-default-appearance: -moz-window-titlebar;
         appearance: auto;
@@ -206,6 +197,7 @@ body {
       }
     }
   }
+  */
 }
 
 .browser-toolbar {
@@ -226,6 +218,14 @@ body {
 
 #titlebar {
   -moz-window-dragging: drag;
+
+  :root[sizemode="fullscreen"] & {
+    display: none;
+  }
+
+  :root:not([customtitlebar], [inFullscreen]) & {
+    display: none;
+  }
 }
 
 .titlebar-buttonbox-container {
@@ -245,52 +245,6 @@ body {
 
   #toolbar-menubar[autohide="true"]:not([inactive]) ~ :is(#TabsToolbar, #nav-bar) > & {
     visibility: hidden;
-  }
-
-  :root:not([customtitlebar], [inFullscreen]) & {
-    display: none;
-  }
-}
-
-.titlebar-spacer {
-  width: 40px;
-
-  :root[inFullscreen] &,
-  :root:not([customtitlebar]) & {
-    display: none;
-  }
-
-  @media (-moz-platform: windows) {
-    :root:not([sizemode=normal]) &[type="pre-tabs"] {
-      display: none;
-    }
-  }
-
-  @media (-moz-platform: linux) and (-moz-gtk-csd-reversed-placement: 0) {
-    :root:not([sizemode=normal]) &[type="pre-tabs"],
-    :root[gtktiledwindow=true] &[type="pre-tabs"] {
-      display: none;
-    }
-  }
-
-  @media (-moz-gtk-csd-reversed-placement) {
-    :root:not([sizemode=normal]) &[type="post-tabs"],
-    :root[gtktiledwindow=true] &[type="post-tabs"] {
-      display: none;
-    }
-  }
-
-  @media (max-width: 500px) {
-    &[type="post-tabs"] {
-      display: none;
-    }
-  }
-
-  /* stylelint-disable-next-line media-query-no-invalid */
-  @media (-moz-bool-pref: "sidebar.verticalTabs") {
-    &[type="pre-tabs"], &[type="post-tabs"] {
-      display: none;
-    }
   }
 }
 
@@ -325,24 +279,30 @@ body {
   }
 }
 
+.titlebar-placeholder {
+  pointer-events: none;
+
+  &[type="appmenu-button"] {
+    order: -1;
+    margin-left: 4px;
+  }
+
+  &[type="caption-buttons"] {
+    margin-left: 22px;
+  }
+}
+
+/* Appmenu button */
+
+#appmenu-button-container {
+  z-index: 1;
+}
+
 /* Menu bar */
 
 #toolbar-menubar {
   &[autohide="true"] {
     overflow: hidden;
-
-    /* For linux and windows, when temporarily showing the menu bar, make it at least
-       as tall as the tab toolbar such that the window controls don't appear to move up.
-       For MacOS, autohide is never true on the menubar.
-    */
-    :root[customtitlebar] #navigator-toolbox:not([tabs-hidden]) > & {
-      min-height: var(--tabstrip-min-height);
-    }
-    /* adjust the height of the auto-hiding toolbar menubar when the tabstrip is
-       hidden and we need to match the height of the nav-bar. */
-    :root[customtitlebar] #navigator-toolbox[tabs-hidden] > & {
-      min-height: calc(var(--urlbar-min-height) + 2 * var(--urlbar-padding-block));
-    }
 
     &[inactive]:not([customizing]) {
       min-height: 0 !important;

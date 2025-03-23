@@ -190,6 +190,18 @@
     </vbox>
   </html:template>
 
+  <vbox id="titlebar">
+    <hbox id="titlebar-content">
+      <hbox id="appmenu-button-container">
+        <button id="appmenu-button" type="menu" label="Echelon"></button>
+      </hbox>
+      <spacer id="titlebar-spacer" flex="1"></spacer>
+
+#include titlebar-items.inc.xhtml
+
+    </hbox>
+  </vbox>
+
 #include navigator-toolbox.inc.xhtml
 
 #include browser-box.inc.xhtml
