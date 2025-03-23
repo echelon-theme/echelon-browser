@@ -124,6 +124,9 @@
                 <menu id="viewToolbarsMenu" data-l10n-id="menu-view-toolbars-menu">
                   <menupopup id="view-menu-popup">
                     <menuseparator/>
+                    <menuitem id="menu_tabsOnTop"
+                              command="cmd_ToggleTabsOnTop"
+                              type="checkbox" data-l10n-id="menu-view-tabs-on-top"/>
                     <menuitem id="menu_customizeToolbars"
                               command="cmd_CustomizeToolbars" data-l10n-id="menu-view-customize-toolbar2"/>
                   </menupopup>

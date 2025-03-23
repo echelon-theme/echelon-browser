@@ -201,3 +201,45 @@ var AutoHideMenubar = {
     this._node.removeAttribute("inactive");
   },
 };
+
+var TabsOnBottom = {
+  get enabled() {
+    return Services.prefs.getBoolPref("browser.tabs.onBottom")
+      && Services.prefs.getIntPref("echelon.theme.style") < 7;
+  },
+
+  set enabled(aValue) {
+    Services.prefs.setBoolPref("browser.tabs.onBottom", aValue);
+  },
+
+  toggle() {
+    this.enabled = !this.enabled;
+  },
+
+  init() {
+    Services.prefs.addObserver("browser.tabs.onBottom", this);
+    Services.prefs.addObserver("echelon.theme.style", this);
+    this._update();
+  },
+
+  observe(aSubject, aTopic, aData) {
+    if (aTopic == "nsPref:changed") {
+      this._update();
+    }
+  },
+
+  _update() {
+    let enabled = this.enabled;
+    if (enabled) {
+      document.documentElement.setAttribute("tabsonbottom", "true");
+    } else {
+      document.documentElement.removeAttribute("tabsonbottom");
+    }
+
+    // Tabs on bottom is displayed to the user as Tabs on Top,
+    // so we need to invert the enabled value.
+    document.getElementById("cmd_ToggleTabsOnTop")
+      .setAttribute("checked", !enabled);
+    CustomTitlebar.updateAppearance();
+  },
+};

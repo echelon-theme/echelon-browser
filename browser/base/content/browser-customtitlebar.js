@@ -113,7 +113,7 @@ var CustomTitlebar = {
     this._hidePlaceholder("caption-buttons");
     titlebarContent.style.marginBottom = null;
     titlebar.style.marginBottom = null;
-    if (allowed) {
+    if (allowed && !TabsOnBottom.enabled) {
       if (this.sizemode == "maximized") {
         // Size placeholders
         let appmenuButtonBox = document.getElementById("appmenu-button-container");
@@ -149,6 +149,10 @@ var CustomTitlebar = {
 
     ToolbarIconColor.inferFromText("customtitlebar", allowed);
     TabBarVisibility.update(true);
+  },
+
+  updateAppearance() {
+    this._update();
   },
 
   uninit() {

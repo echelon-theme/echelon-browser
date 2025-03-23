@@ -1077,6 +1077,9 @@ pref("browser.tabs.searchclipboardfor.middleclick", true);
 pref("browser.tabs.searchclipboardfor.middleclick", false);
 #endif
 
+// Whether the tabs toolbar should be below the bookmarks toolbar.
+pref("browser.tabs.onBottom", false);
+
 #if defined(XP_MACOSX)
   // During low memory periods, poll with this frequency (milliseconds)
   // until memory is no longer low. Changes to the pref take effect immediately.

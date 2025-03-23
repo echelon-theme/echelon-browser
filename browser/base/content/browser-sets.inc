@@ -38,6 +38,7 @@
     <command id="cmd_maximizeWindow" />
     <command id="cmd_restoreWindow" />
     <command id="cmd_toggleMute" />
+    <command id="cmd_ToggleTabsOnTop" />
     <command id="cmd_CustomizeToolbars" />
     <command id="cmd_toggleOfflineStatus" />
     <command id="cmd_quitApplication" />

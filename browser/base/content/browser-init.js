@@ -108,6 +108,10 @@ var gBrowserInit = {
     // Update the customtitlebar attribute so the window can be sized
     // correctly.
     window.TabBarVisibility.update();
+    // Run tabs on bottom initialization before CustomTitlebar to avoid
+    // a duplicate update.
+    TabsOnBottom.init();
+
     CustomTitlebar.init();
 
     new LightweightThemeConsumer(document);

@@ -108,6 +108,10 @@
   --tab-group-label-text-dark: var(--color-gray-100);
 }
 
+:root[tabsonbottom] #TabsToolbar {
+  order: 1000;
+}
+
 /* stylelint-disable-next-line media-query-no-invalid */
 @media (-moz-bool-pref: "sidebar.verticalTabs") {
   :root {
