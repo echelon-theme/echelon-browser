@@ -179,7 +179,7 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
     return NS_OK;
   }
 
-  // Titlebar colors are color-scheme aware.
+  // Titlebar and menu hover colors are color-scheme aware.
   switch (aID) {
     case ColorID::Activecaption:
       aColor = mTitlebarColors.Get(aScheme, true).mBg;
@@ -198,6 +198,10 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
       return NS_OK;
     case ColorID::Inactiveborder:
       aColor = mTitlebarColors.Get(aScheme, false).mBorder;
+      return NS_OK;
+    case ColorID::MozMenuhover:
+    case ColorID::MozMenuhoverdisabled:
+      aColor = NS_TRANSPARENT;
       return NS_OK;
     default:
       break;
@@ -485,6 +489,9 @@ nsresult nsLookAndFeel::NativeGetInt(IntID aID, int32_t& aResult) {
       break;
     case IntID::WindowsMica:
       aResult = WinUtils::MicaEnabled();
+      break;
+    case IntID::WindowsMicaPopups:
+      aResult = WinUtils::MicaPopupsEnabled();
       break;
     case IntID::AlertNotificationOrigin:
       aResult = 0;

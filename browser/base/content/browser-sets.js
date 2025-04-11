@@ -209,7 +209,7 @@ document.addEventListener(
             gProfiles.handleCommand(event);
             break;
           case "Tools:Search":
-            BrowserSearch.webSearch();
+            SearchUIUtils.webSearch(window);
             break;
           case "Tools:Downloads":
             BrowserCommands.downloadsUI();

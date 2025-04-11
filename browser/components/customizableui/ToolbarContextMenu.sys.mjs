@@ -264,7 +264,7 @@ export var ToolbarContextMenu = {
     // when hiding the "moveToPanel" and "removeFromToolbar" items on flexible
     // space items. But we need to ensure its hidden state is reset in the case
     // the context menu is subsequently opened on a non-flexible space item.
-    let menuSeparator = document.getElementById("toolbarItemsMenuSeparator");
+    let menuSeparator = document.getElementById("tabbarItemsMenuSeparator");
     menuSeparator.hidden = false;
 
     document.getElementById("toolbarNavigatorItemsMenuSeparator").hidden =
@@ -280,6 +280,10 @@ export var ToolbarContextMenu = {
       moveToPanel.hidden = true;
       removeFromToolbar.hidden = true;
       menuSeparator.hidden = !showTabStripItems;
+    }
+
+    if (toolbarItem?.id != "tabbrowser-tabs") {
+      menuSeparator.hidden = true;
     }
 
     if (showTabStripItems) {

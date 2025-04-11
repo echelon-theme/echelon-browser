@@ -2281,6 +2281,7 @@ STATIC_ATOMS = [
     Atom("_moz_windows_compositor", "-moz-windows-compositor"), 
     Atom("_moz_windows_classic", "-moz-windows-classic"), 
     Atom("_moz_windows_mica", "-moz-windows-mica"), 
+    Atom("_moz_windows_mica_popups", "-moz-windows-mica-popups"),
     Atom("_moz_mac_big_sur_theme", "-moz-mac-big-sur-theme"),
     Atom("_moz_mac_rtl", "-moz-mac-rtl"),
     Atom("_moz_mac_titlebar_height", "-moz-mac-titlebar-height"),
