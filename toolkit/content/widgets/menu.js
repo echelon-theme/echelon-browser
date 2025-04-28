@@ -490,4 +490,167 @@
   }
 
   customElements.define("menu", MozMenu);
+
+  class MozSplitMenu extends MozXULElement {
+    get fragment() {
+      let frag = document.importNode(
+        MozXULElement.parseXULToFragment(`
+      <menuitem anonid="menuitem" flex="1"
+                class="splitmenu-menuitem"/>
+      <menu anonid="menu" class="splitmenu-menu"/>
+    `),
+        true
+      );
+      Object.defineProperty(this, "fragment", { value: frag });
+      return frag;
+    }
+
+    static get inheritedAttributes() {
+      return {
+        ".splitmenu-menuitem": "iconic,label,disabled,onclick=oncommand,_moz-menuactive=active",
+        ".splitmenu-menu": "disabled,_moz-menuactive=active"
+      }
+    }
+
+    renderedOnce = false;
+    _menuDelay = 600;
+    _observer = null;
+
+    get _parentMenupopup() {
+      return this._getParentMenupopup(this);
+    }
+
+    _getParentMenupopup(aNode) {
+      let node = aNode.parentNode;
+      while (node) {
+        if (node.localName == "menupopup")
+          break;
+        node = node.parentNode;
+      }
+      return node;
+    }
+
+    connectedCallback() {
+      if (this.renderedOnce || this.delayConnectedCallback()) {
+        return;
+      }
+
+      this._parentMenupopup.addEventListener("DOMMenuItemActive", this, false);
+      this._parentMenupopup.addEventListener("popuphidden", this, false);
+
+      this.addEventListener("mouseover", this);
+      this.addEventListener("popupshowing", this);
+      this.addEventListener("click", this);
+
+      this.renderedOnce = true;
+      this.append(this.fragment);
+      let menupopup = this.querySelector(":scope > menupopup");
+      if (menupopup)
+        this.menu.append(menupopup);
+
+      // This was an oncommand attribute in the original XBL version,
+      // but the CORS policy disallows this now.
+      this.menu.addEventListener("command", event => event.stopPropagation());
+
+      // Attribute inheritance only works when the parent attributes change.
+      // We need to keep the menu items active.
+      const observerConfig = {
+        attributes: true,
+        attributeFilter: ["_moz-menuactive"]
+      };
+      this._observer = new MutationObserver(this._onMenuMutation.bind(this));
+      this._observer.observe(this.menuitem, observerConfig);
+      this._observer.observe(this.menu, observerConfig);
+
+      this.initializeAttributeInheritance();
+    }
+
+    _onMenuMutation(mutationList) {
+      for (const mutation of mutationList) {
+        let menu = mutation.target;
+        if (this.getAttribute("active") == "true" && !menu.getAttribute("_moz-menuactive")) {
+          menu.setAttribute("_moz-menuactive", "true");
+        }
+      }
+    }
+
+    get menuitem() {
+      return this.querySelector(`[anonid="menuitem"]`);
+    }
+
+    get menu() {
+      return this.querySelector(`[anonid="menu"]`);
+    }
+
+    _menuDelay = 600;
+
+    handleEvent(event) {
+      switch (event.type) {
+        case "DOMMenuItemActive":
+          if (this.getAttribute("active") == "true" &&
+              event.target != this &&
+              event.target != this.menu &&
+              event.target != this.menuitem &&
+              this._getParentMenupopup(event.target) == this._parentMenupopup)
+            this.removeAttribute("active");
+          return;
+        case "popuphidden":
+          if (event.target == this._parentMenupopup)
+            this.removeAttribute("active");
+          return;
+        default: {
+          let methodName = "on_" + event.type;
+          if (methodName in this) {
+            this[methodName](event);
+          }
+        }
+      }
+      return super.handleEvent(event);
+    }
+
+    on_mouseover() {
+      if (this.getAttribute("active") != "true") {
+        this.setAttribute("active", "true");
+
+        let event = document.createEvent("Events");
+        event.initEvent("DOMMenuItemActive", true, false);
+        this.dispatchEvent(event);
+
+        if (this.getAttribute("disabled") != "true") {
+          let self = this;
+          setTimeout(function () {
+            if (self.getAttribute("active") == "true")
+              self.menu.open = true;
+          }, this._menuDelay);
+        }
+      }
+    }
+
+    on_popupshowing(event) {
+      if (event.target == this.firstChild &&
+        this._parentMenupopup._currentPopup)
+      this._parentMenupopup._currentPopup.hidePopup();
+    }
+
+    on_click(event) {
+      if (this.getAttribute("disabled") == "true") {
+        // Prevent the command from being carried out
+        event.stopPropagation();
+        return;
+      }
+
+      let node = event.originalTarget;
+      while (true) {
+        if (node == this.menuitem)
+          break;
+        if (node == this)
+          return;
+        node = node.parentNode;
+      }
+
+      this._parentMenupopup.hidePopup();
+    }
+  }
+
+  customElements.define("splitmenu", MozSplitMenu);
 }

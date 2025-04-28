@@ -263,3 +263,10 @@ menulist > menupopup > menuseparator {
   border-top: 1px solid #000000;
   border-bottom: none;
 }
+
+/* ::::: splitmenu ::::: */
+
+.splitmenu-menuitem {
+  margin-inline-end: 1px;
+  padding-inline-end: 0.5em;
+}

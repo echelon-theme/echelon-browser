@@ -167,3 +167,15 @@ menucaption {
     margin-inline-start: 25px;
   }
 }
+
+
+/* Split menu */
+
+.splitmenu-menu > .menu-text,
+:is(.splitmenu-menu, .splitmenu-menuitem) > .menu-accel-container {
+  display: none;
+}
+
+.splitmenu-menu {
+  justify-content: flex-end;
+}
