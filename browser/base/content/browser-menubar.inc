@@ -429,8 +429,8 @@
                 <menuitem id="help_reportBrokenSite"
                           command="cmd_reportBrokenSite"
                           data-l10n-id="menu-report-broken-site"
-                          hidden="true"
-                          appmenu-data-l10n-id="menu-report-broken-site"/>
+                          disabled="true"
+                          appmenu-data-l10n-id="appmenuitem-report-broken-site"/>
                 <menuitem id="feedbackPage"
                           data-l10n-id="menu-help-share-ideas"
                           appmenu-data-l10n-id="appmenu-help-share-ideas"/>
@@ -440,10 +440,6 @@
                 <menuitem id="troubleShooting"
                           data-l10n-id="menu-help-more-troubleshooting-info"
                           appmenu-data-l10n-id="appmenu-help-more-troubleshooting-info"/>
-                <menuitem id="help_reportSiteIssue"
-                          data-l10n-id="menu-help-report-site-issue"
-                          appmenu-data-l10n-id="appmenu-help-report-site-issue"
-                          hidden="true"/>
                 <menuitem id="menu_HelpPopup_reportPhishingtoolmenu"
                           disabled="true"
                           hidden="true"

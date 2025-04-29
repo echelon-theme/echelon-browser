@@ -10,21 +10,25 @@
 #include "nsStyleConsts.h"
 #include "nsUXThemeData.h"
 #include "nsUXThemeConstants.h"
+#include "nsWindowDefs.h"
 #include "nsWindowsHelpers.h"
 #include "WinUtils.h"
 #include "WindowsUIUtils.h"
 #include "mozilla/FontPropertyTypes.h"
 #include "mozilla/Telemetry.h"
+#include "mozilla/intl/LocaleService.h"
 #include "mozilla/widget/WinRegistry.h"
 #include "mozilla/StaticPrefs_echelon.h"
+
+#define AVG2(a, b) (((a) + (b) + 1) >> 1)
 
 using namespace mozilla;
 using namespace mozilla::widget;
 
-static Maybe<nscolor> GetColorFromTheme(nsUXThemeClass cls, int32_t aPart,
+static Maybe<nscolor> GetColorFromTheme(UXThemeClass cls, int32_t aPart,
                                         int32_t aState, int32_t aPropId) {
   COLORREF color;
-  HRESULT hr = GetThemeColor(nsUXThemeData::GetTheme(cls), aPart, aState,
+  HRESULT hr = GetThemeColor(nsLookAndFeel::GetTheme(cls), aPart, aState,
                              aPropId, &color);
   if (hr == S_OK) {
     return Some(COLOREF_2_NSRGB(color));
@@ -46,6 +50,62 @@ static int32_t GetTooltipOffsetVertical() {
   }
   return std::ceilf(float(LookAndFeel::kDefaultTooltipOffset) *
                     float(cursorSize) / float(kDefaultCursorSize));
+}
+
+UXThemeHandle::~UXThemeHandle() { Close(); }
+
+void UXThemeHandle::OpenOnce(LPCWSTR aClassList) {
+  if (mHandle.isSome()) {
+    return;
+  }
+
+  mHandle = Some(OpenThemeData(nullptr, aClassList));
+}
+
+void UXThemeHandle::Close() {
+  if (mHandle.isNothing()) {
+    return;
+  }
+
+  if (HANDLE rawHandle = mHandle.extract()) {
+    CloseThemeData(rawHandle);
+  }
+}
+
+UXThemeHandle::operator HANDLE() { return mHandle.valueOr(nullptr); }
+
+static const wchar_t* GetUXThemeClassName(UXThemeClass aClass) {
+  switch (aClass) {
+    case UXThemeClass::Button:
+      return L"Button";
+    case UXThemeClass::Edit:
+      return L"Edit";
+    case UXThemeClass::Toolbar:
+      return L"Toolbar";
+    case UXThemeClass::Progress:
+      return L"Progress";
+    case UXThemeClass::Tab:
+      return L"Tab";
+    case UXThemeClass::Trackbar:
+      return L"Trackbar";
+    case UXThemeClass::Combobox:
+      return L"Combobox";
+    case UXThemeClass::Listview:
+      return L"Listview";
+    case UXThemeClass::Menu:
+      return L"Menu";
+    case UXThemeClass::NumClasses:
+      break;
+  }
+  MOZ_ASSERT_UNREACHABLE("unknown uxtheme class");
+  return L"";
+}
+
+HANDLE nsLookAndFeel::GetTheme(UXThemeClass aClass) {
+  auto& handle =
+      static_cast<nsLookAndFeel*>(GetInstance())->mThemeHandles[aClass];
+  handle.OpenOnce(GetUXThemeClassName(aClass));
+  return handle;
 }
 
 static bool SystemWantsDarkTheme() {
@@ -120,11 +180,15 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
                                        nscolor& aColor) {
   EnsureInit();
 
+  auto UseNonNativeMenuColors = [&]() -> bool {
+    return !mHighContrastOn || aScheme == ColorScheme::Dark;
+  };
+
   auto IsHighlightColor = [&] {
     switch (aID) {
       case ColorID::MozButtonhoverface:
       case ColorID::MozButtonactivetext:
-        return nsUXThemeData::IsHighContrastOn();
+        return mHighContrastOn;
       case ColorID::MozMenuhover:
         return true;
       case ColorID::Highlight:
@@ -144,7 +208,7 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
     switch (aID) {
       case ColorID::MozButtonhovertext:
       case ColorID::MozButtonactiveface:
-        return nsUXThemeData::IsHighContrastOn();
+        return mHighContrastOn;
       case ColorID::MozMenubarhovertext:
       case ColorID::MozMenuhovertext:
         return !mColorMenuHoverText;
@@ -179,7 +243,7 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
     return NS_OK;
   }
 
-  // Titlebar and menu hover colors are color-scheme aware.
+  // Titlebar and menu colors are color-scheme aware.
   switch (aID) {
     case ColorID::Activecaption:
       aColor = mTitlebarColors.Get(aScheme, true).mBg;
@@ -203,6 +267,20 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
     case ColorID::MozMenuhoverdisabled:
       aColor = NS_TRANSPARENT;
       return NS_OK;
+    case ColorID::Menu: {
+      if (UseNonNativeMenuColors()) {
+        if (WinUtils::MicaPopupsEnabled()) {
+          aColor = aScheme == ColorScheme::Dark ? NS_RGBA(0, 0, 0, 153)
+                                                : NS_RGBA(255, 255, 255, 153);
+        } else {
+          aColor = aScheme == ColorScheme::Dark ? *GenericDarkColor(aID)
+                                                : NS_RGB(0xf9, 0xf9, 0xfb);
+        }
+      } else {
+        aColor = GetColorForSysColorIndex(COLOR_MENU);
+      }
+      return NS_OK;
+    }
     default:
       break;
   }
@@ -282,17 +360,7 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
       aColor = NS_RGB(0xe0, 0xe0, 0xe6);
       return NS_OK;
     case ColorID::MozMenuhoverdisabled:
-      aColor = NS_TRANSPARENT;
       return NS_OK;
-    case ColorID::Infobackground:
-      idx = COLOR_INFOBK;
-      break;
-    case ColorID::Infotext:
-      idx = COLOR_INFOTEXT;
-      break;
-    case ColorID::Menu:
-      idx = COLOR_MENU;
-      break;
     case ColorID::Menutext:
       idx = COLOR_MENUTEXT;
       break;
@@ -326,14 +394,13 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
       idx = COLOR_WINDOWTEXT;
       break;
     case ColorID::MozDisabledfield:
-      idx = nsUXThemeData::IsHighContrastOn() ? COLOR_BTNFACE : COLOR_3DLIGHT;
+      idx = mHighContrastOn ? COLOR_BTNFACE : COLOR_3DLIGHT;
       break;
     case ColorID::Field:
-      idx = nsUXThemeData::IsHighContrastOn() ? COLOR_BTNFACE : COLOR_WINDOW;
+      idx = mHighContrastOn ? COLOR_BTNFACE : COLOR_WINDOW;
       break;
     case ColorID::Fieldtext:
-      idx =
-          nsUXThemeData::IsHighContrastOn() ? COLOR_BTNTEXT : COLOR_WINDOWTEXT;
+      idx = mHighContrastOn ? COLOR_BTNTEXT : COLOR_WINDOWTEXT;
       break;
     case ColorID::MozEventreerow:
     case ColorID::MozOddtreerow:
@@ -364,9 +431,27 @@ nsresult nsLookAndFeel::NativeGetColor(ColorID aID, ColorScheme aScheme,
     case ColorID::MozColheaderactivetext:
       idx = COLOR_WINDOWTEXT;
       break;
-    case ColorID::MozNativehyperlinktext:
+    case ColorID::Visitedtext: {
+      if (mHighContrastOn) {
+        // The fallback visited link color on HCM (given there's no
+        // system-provided one) is produced by preserving the foreground's
+        // green and averaging the foreground and background for the red and
+        // blue.  This is how IE and Edge do it too.
+        auto windowText = GetColorForSysColorIndex(COLOR_WINDOWTEXT);
+        auto window = GetColorForSysColorIndex(COLOR_WINDOW);
+        aColor = NS_RGB(AVG2(NS_GET_R(windowText), NS_GET_R(window)),
+                        NS_GET_G(windowText),
+                        AVG2(NS_GET_B(windowText), NS_GET_B(window)));
+      } else {
+        // Otherwise use the stand-in.
+        aColor = GetStandinForNativeColor(aID, aScheme);
+      }
+      return NS_OK;
+    }
+    case ColorID::Linktext:
       idx = COLOR_HOTLIGHT;
       break;
+    case ColorID::Activetext:
     case ColorID::Marktext:
     case ColorID::Mark:
     case ColorID::SpellCheckerUnderline:
@@ -442,7 +527,7 @@ nsresult nsLookAndFeel::NativeGetInt(IntID aID, int32_t& aResult) {
       // High contrast is a misnomer under Win32 -- any theme can be used with
       // it, e.g. normal contrast with large fonts, low contrast, etc. The high
       // contrast flag really means -- use this theme and don't override it.
-      aResult = nsUXThemeData::IsHighContrastOn();
+      aResult = mHighContrastOn;
       break;
     case IntID::ScrollArrowStyle:
       aResult = eScrollArrowStyle_Single;
@@ -494,38 +579,10 @@ nsresult nsLookAndFeel::NativeGetInt(IntID aID, int32_t& aResult) {
       aResult = WinUtils::MicaPopupsEnabled();
       break;
     case IntID::AlertNotificationOrigin:
-      aResult = 0;
-      {
-        // Get task bar window handle
-        HWND shellWindow = FindWindowW(L"Shell_TrayWnd", nullptr);
-
-        if (shellWindow != nullptr) {
-          // Determine position
-          APPBARDATA appBarData;
-          appBarData.hWnd = shellWindow;
-          appBarData.cbSize = sizeof(appBarData);
-          if (SHAppBarMessage(ABM_GETTASKBARPOS, &appBarData)) {
-            // Set alert origin as a bit field - see LookAndFeel.h
-            // 0 represents bottom right, sliding vertically.
-            switch (appBarData.uEdge) {
-              case ABE_LEFT:
-                aResult = NS_ALERT_HORIZONTAL | NS_ALERT_LEFT;
-                break;
-              case ABE_RIGHT:
-                aResult = NS_ALERT_HORIZONTAL;
-                break;
-              case ABE_TOP:
-                aResult = NS_ALERT_TOP;
-                [[fallthrough]];
-              case ABE_BOTTOM:
-                // If the task bar is right-to-left,
-                // move the origin to the left
-                if (::GetWindowLong(shellWindow, GWL_EXSTYLE) & WS_EX_LAYOUTRTL)
-                  aResult |= NS_ALERT_LEFT;
-                break;
-            }
-          }
-        }
+      aResult = NS_ALERT_TOP;
+      if (intl::LocaleService::GetInstance()->IsAppLocaleRTL()) {
+        // If the task bar is right-to-left, move the origin to the left
+        aResult |= NS_ALERT_LEFT;
       }
       break;
     case IntID::IMERawInputUnderlineStyle:
@@ -570,9 +627,10 @@ nsresult nsLookAndFeel::NativeGetInt(IntID aID, int32_t& aResult) {
     case IntID::TooltipOffsetVertical:
       aResult = GetTooltipOffsetVertical();
       break;
-    case IntID::SystemUsesDarkTheme:
+    case IntID::SystemUsesDarkTheme: {
       aResult = SystemWantsDarkTheme();
       break;
+    }
     case IntID::SystemScrollbarSize:
       aResult = std::max(WinUtils::GetSystemMetricsForDpi(SM_CXVSCROLL, 96),
                          WinUtils::GetSystemMetricsForDpi(SM_CXHSCROLL, 96));
@@ -915,8 +973,21 @@ void nsLookAndFeel::EnsureInit() {
   }
   mInitialized = true;
 
-  mColorMenuHoverText =
-      ::GetColorFromTheme(eUXMenu, MENU_POPUPITEM, MPI_HOT, TMT_TEXTCOLOR);
+  for (auto& handle : mThemeHandles) {
+    handle.Close();
+  }
+
+  mHighContrastOn = []() {
+    HIGHCONTRAST hc;
+    hc.cbSize = sizeof(HIGHCONTRAST);
+    return ::SystemParametersInfo(SPI_GETHIGHCONTRAST, 0, &hc, 0) &&
+           hc.dwFlags & HCF_HIGHCONTRASTON;
+  }();
+
+  const bool neededMicaWorkaround = NeedsMicaWorkaround();
+
+  mColorMenuHoverText = ::GetColorFromTheme(UXThemeClass::Menu, MENU_POPUPITEM,
+                                            MPI_HOT, TMT_TEXTCOLOR);
 
   // Fill out the sys color table.
   for (int i = SYS_COLOR_MIN; i <= SYS_COLOR_MAX; ++i) {
@@ -967,4 +1038,10 @@ void nsLookAndFeel::EnsureInit() {
   mCurrentColorFilter = SystemColorFilter();
 
   RecordTelemetry();
+
+  if (neededMicaWorkaround != NeedsMicaWorkaround()) {
+    WinUtils::UpdateMicaInAllWindows();
+  }
 }
+
+#undef AVG2

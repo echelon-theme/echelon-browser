@@ -36,6 +36,11 @@
         --toolbarbutton-icon-fill: currentColor;
         --toolbarbutton-hover-background: color-mix(in srgb, currentColor 17%, transparent);
         --toolbarbutton-active-background: color-mix(in srgb, currentColor 30%, transparent);
+        --toolbar-field-color: currentColor;
+        --urlbar-box-bgcolor: var(--button-background-color-hover);
+        --urlbar-box-focus-bgcolor: var(--button-background-color);
+        --urlbar-box-hover-bgcolor: var(--button-background-color-hover);
+        --urlbar-box-active-bgcolor: var(--button-background-color-active);
       }
 
       &[sizemode="normal"] #titlebar {
