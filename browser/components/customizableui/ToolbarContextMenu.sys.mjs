@@ -260,13 +260,6 @@ export var ToolbarContextMenu = {
         el.removeAttribute("data-lazy-l10n-id");
       });
 
-    // The "normal" toolbar items menu separator is hidden because it's unused
-    // when hiding the "moveToPanel" and "removeFromToolbar" items on flexible
-    // space items. But we need to ensure its hidden state is reset in the case
-    // the context menu is subsequently opened on a non-flexible space item.
-    let menuSeparator = document.getElementById("tabbarItemsMenuSeparator");
-    menuSeparator.hidden = false;
-
     document.getElementById("toolbarNavigatorItemsMenuSeparator").hidden =
       !showTabStripItems;
 
